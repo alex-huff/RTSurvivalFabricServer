@@ -1,23 +1,15 @@
 package dev.phonis.sharedwaypoints.server.commands;
 
 import com.mojang.brigadier.arguments.IntegerArgumentType;
-import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.mojang.brigadier.suggestion.Suggestions;
-import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import net.minecraft.server.command.ServerCommandSource;
 
-import java.util.concurrent.CompletableFuture;
+public class IntegerCommandArgument extends NoSuggestionCommandArgument<Integer> {
 
-public class IntegerCommandArgument extends CommandArgument<Integer> {
-
-    public IntegerCommandArgument(String name) {
-        super(name, IntegerArgumentType.integer(0, 123));
+    public IntegerCommandArgument(String name, int min, int max) {
+        super(name, IntegerArgumentType.integer(min, max));
     }
 
-    @Override
-    public CompletableFuture<Suggestions> getSuggestions(CommandContext<ServerCommandSource> context, SuggestionsBuilder builder) throws CommandSyntaxException {
-        return Suggestions.empty();
+    public IntegerCommandArgument(String name) {
+        this(name, Integer.MIN_VALUE, Integer.MAX_VALUE);
     }
 
 }

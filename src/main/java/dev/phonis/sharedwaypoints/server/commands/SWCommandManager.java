@@ -23,6 +23,7 @@ public class SWCommandManager {
     public static void registerCommands(CommandDispatcher<ServerCommandSource> dispatcher, boolean dedicated) {
         if (dedicated) {
             for (IServerCommand command : SWCommandManager.commands) {
+                // register command and its aliases
                 SWCommandManager.buildCommand(command).forEach(dispatcher::register);
             }
         }
@@ -32,6 +33,7 @@ public class SWCommandManager {
         LiteralArgumentBuilder<ServerCommandSource> rootCommand = LiteralArgumentBuilder.literal(command.getName());
         List<LiteralArgumentBuilder<ServerCommandSource>> redirects = new LinkedList<>();
 
+        // recurse down the tree and link all nodes at next depth including aliases which have already been redirected
         for (IServerCommand subCommand : command.getSubCommands()) {
             SWCommandManager.buildCommand(subCommand).forEach(rootCommand::then);
         }
@@ -41,6 +43,8 @@ public class SWCommandManager {
 
         rootCommand.executes(command::execute);
 
+        // needs to be build backwards since ArgumentBuilders' then is depended on the parameter to be already build
+        // which happens by nature of the code structure when using the library as intended
         for (int i = arguments.size() - 1; i >= 0; i--) {
             CommandArgument<?> commandArgument = arguments.get(i);
             RequiredArgumentBuilder<ServerCommandSource, ?> argumentBuilder = RequiredArgumentBuilder.argument(commandArgument.name, commandArgument.type);
