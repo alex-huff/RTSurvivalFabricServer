@@ -20,10 +20,6 @@ public abstract class NoArgServerCommand extends AbstractServerCommand {
         return arguments;
     }
 
-    protected boolean constructArgs(CommandContext<ServerCommandSource> source) {
-        return true;
-    }
-
     @Override
     public void onCommand(CommandContext<ServerCommandSource> source) throws CommandException, CommandSyntaxException {
         this.onOptionalCommand(source);

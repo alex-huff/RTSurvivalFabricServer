@@ -18,8 +18,6 @@ public abstract class OptionalSingleServerCommand<A> extends NoArgServerCommand 
     }
 
     protected boolean constructArgs(CommandContext<ServerCommandSource> source, Single<A> single) throws CommandException, CommandSyntaxException {
-        if (!super.constructArgs(source)) return false;
-
         try {
             A aArg = (A) source.getArgument(this.a.name, Object.class);
 
