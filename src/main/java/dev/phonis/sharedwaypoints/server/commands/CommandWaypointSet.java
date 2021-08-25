@@ -1,4 +1,4 @@
-package dev.phonis.sharedwaypoints.server.commands.impl;
+package dev.phonis.sharedwaypoints.server.commands;
 
 import com.mojang.brigadier.context.CommandContext;
 import dev.phonis.sharedwaypoints.server.commands.internal.AbstractServerCommand;
