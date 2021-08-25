@@ -5,6 +5,7 @@ import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
+import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.minecraft.server.command.ServerCommandSource;
 
 import java.util.ArrayList;
@@ -17,6 +18,10 @@ public class SWCommandManager {
 
     public static void addCommand(IServerCommand command) {
         SWCommandManager.commands.add(command);
+    }
+
+    public static void register() {
+        CommandRegistrationCallback.EVENT.register(SWCommandManager::registerCommands);
     }
 
     public static void registerCommands(CommandDispatcher<ServerCommandSource> dispatcher, boolean dedicated) {
