@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "id": "sharedwaypointsserver",
+  "id": "sharedwaypoints-server-mod",
   "version": "${version}",
 
   "name": "Shared Waypoints Server",
