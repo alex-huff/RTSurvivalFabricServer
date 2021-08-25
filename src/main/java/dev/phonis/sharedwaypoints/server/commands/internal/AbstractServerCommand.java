@@ -47,8 +47,6 @@ public abstract class AbstractServerCommand implements IServerCommand {
         return this.name;
     }
 
-    public abstract void onCommand(CommandContext<ServerCommandSource> source) throws CommandException, CommandSyntaxException;
-
     @Override
     public int execute(CommandContext<ServerCommandSource> source) {
         try {
@@ -62,5 +60,7 @@ public abstract class AbstractServerCommand implements IServerCommand {
 
         return Command.SINGLE_SUCCESS;
     }
+
+    public abstract void onCommand(CommandContext<ServerCommandSource> source) throws CommandException, CommandSyntaxException;
 
 }

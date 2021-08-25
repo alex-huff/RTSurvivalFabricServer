@@ -5,8 +5,6 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import dev.phonis.sharedwaypoints.server.commands.util.Pair;
 import net.minecraft.server.command.ServerCommandSource;
 
-import java.util.List;
-
 public abstract class OptionalPairServerCommand<A, B> extends OptionalSingleServerCommand<A> {
 
     private final CommandArgument<B> b;
@@ -15,15 +13,8 @@ public abstract class OptionalPairServerCommand<A, B> extends OptionalSingleServ
         super(name, a);
 
         this.b = b;
-    }
 
-    @Override
-    public List<CommandArgument<?>> getArguments() {
-        List<CommandArgument<?>> arguments = super.getArguments();
-
-        arguments.add(this.b);
-
-        return arguments;
+        this.arguments.add(this.b);
     }
 
     protected boolean constructArgs(CommandContext<ServerCommandSource> source, Pair<A, B> pair) throws CommandException, CommandSyntaxException {

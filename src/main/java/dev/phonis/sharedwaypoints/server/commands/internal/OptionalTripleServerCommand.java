@@ -5,8 +5,6 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import dev.phonis.sharedwaypoints.server.commands.util.Triple;
 import net.minecraft.server.command.ServerCommandSource;
 
-import java.util.List;
-
 public abstract class OptionalTripleServerCommand<A, B, C> extends OptionalPairServerCommand<A, B> {
 
     private final CommandArgument<C> c;
@@ -15,15 +13,8 @@ public abstract class OptionalTripleServerCommand<A, B, C> extends OptionalPairS
         super(name, a, b);
 
         this.c = c;
-    }
 
-    @Override
-    public List<CommandArgument<?>> getArguments() {
-        List<CommandArgument<?>> arguments = super.getArguments();
-
-        arguments.add(this.c);
-
-        return arguments;
+        this.arguments.add(this.c);
     }
 
     protected boolean constructArgs(CommandContext<ServerCommandSource> source, Triple<A, B, C> triple) throws CommandException, CommandSyntaxException {

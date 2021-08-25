@@ -9,13 +9,15 @@ import java.util.List;
 
 public abstract class NoArgServerCommand extends AbstractServerCommand {
 
+    protected final List<CommandArgument<?>> arguments = new LinkedList<>();
+
     public NoArgServerCommand(String name) {
         super(name);
     }
 
     @Override
     public List<CommandArgument<?>> getArguments() {
-        return new LinkedList<>();
+        return arguments;
     }
 
     protected boolean constructArgs(CommandContext<ServerCommandSource> source) {
