@@ -3,7 +3,6 @@ package dev.phonis.sharedwaypoints.server.commands.internal;
 import com.mojang.brigadier.context.CommandContext;
 import dev.phonis.sharedwaypoints.server.commands.argument.CommandArgument;
 import dev.phonis.sharedwaypoints.server.commands.util.ContextUtil;
-import net.minecraft.entity.Entity;
 import net.minecraft.server.command.ServerCommandSource;
 
 import java.util.Collections;
