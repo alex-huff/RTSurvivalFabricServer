@@ -2,7 +2,6 @@ package dev.phonis.sharedwaypoints.server.commands.internal;
 
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import dev.phonis.sharedwaypoints.server.commands.util.Single;
 import net.minecraft.server.command.ServerCommandSource;
 
 import java.util.LinkedList;
