@@ -1,0 +1,78 @@
+package dev.phonis.sharedwaypoints.server.commands;
+
+import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.builder.ArgumentBuilder;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.builder.RequiredArgumentBuilder;
+import com.mojang.brigadier.tree.LiteralCommandNode;
+import dev.phonis.sharedwaypoints.server.commands.impl.CommandWaypoint;
+import net.minecraft.server.command.ServerCommandSource;
+
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+
+public class SWCommandManager {
+
+    private static final List<IServerCommand> commands = new ArrayList<>();
+
+    static {
+        SWCommandManager.commands.add(new CommandWaypoint());
+    }
+
+    public static void registerCommands(CommandDispatcher<ServerCommandSource> dispatcher, boolean dedicated) {
+        if (dedicated) {
+            for (IServerCommand command : SWCommandManager.commands) {
+                SWCommandManager.buildCommand(command).forEach(dispatcher::register);
+            }
+        }
+    }
+
+    private static List<LiteralArgumentBuilder<ServerCommandSource>> buildCommand(IServerCommand command) {
+        LiteralArgumentBuilder<ServerCommandSource> rootCommand = LiteralArgumentBuilder.literal(command.getName());
+        List<LiteralArgumentBuilder<ServerCommandSource>> redirects = new LinkedList<>();
+
+        for (IServerCommand subCommand : command.getSubCommands()) {
+            SWCommandManager.buildCommand(subCommand).forEach(rootCommand::then);
+        }
+
+        ArgumentBuilder<ServerCommandSource, ?> previous = null;
+        List<CommandArgument<?>> arguments = command.getArguments();
+
+        rootCommand.executes(command::execute);
+
+        for (int i = arguments.size() - 1; i >= 0; i--) {
+            CommandArgument<?> commandArgument = arguments.get(i);
+            RequiredArgumentBuilder<ServerCommandSource, ?> argumentBuilder = RequiredArgumentBuilder.argument(commandArgument.name, commandArgument.type);
+
+            argumentBuilder.executes(command::execute);
+            argumentBuilder.suggests(commandArgument);
+
+            if (previous != null) {
+                argumentBuilder.then(previous);
+            }
+
+            previous = argumentBuilder;
+        }
+
+        if (previous != null)
+            rootCommand.then(previous);
+
+        redirects.add(rootCommand);
+
+        LiteralCommandNode<ServerCommandSource> commandNode = rootCommand.build();
+
+        for (String alias : command.getAliases()) {
+            LiteralArgumentBuilder<ServerCommandSource> aliasCommand = LiteralArgumentBuilder.literal(alias);
+
+            // Seems as if redirect is only relevant in parsing down the tree, and not redirecting execution
+            // That means all aliases need to also set their executor
+            aliasCommand.executes(command::execute);
+            aliasCommand.redirect(commandNode);
+            redirects.add(aliasCommand);
+        }
+
+        return redirects;
+    }
+
+}
