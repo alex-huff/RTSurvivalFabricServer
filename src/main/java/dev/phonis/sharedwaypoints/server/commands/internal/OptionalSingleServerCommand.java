@@ -1,4 +1,4 @@
-package dev.phonis.sharedwaypoints.server.commands;
+package dev.phonis.sharedwaypoints.server.commands.internal;
 
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -8,7 +8,7 @@ import net.minecraft.server.command.ServerCommandSource;
 import java.util.LinkedList;
 import java.util.List;
 
-public abstract class OptionalSingleServerCommand<A> extends AbstractServerCommand {
+public abstract class OptionalSingleServerCommand<A> extends NoArgServerCommand {
 
     private final CommandArgument<A> a;
 
@@ -20,7 +20,7 @@ public abstract class OptionalSingleServerCommand<A> extends AbstractServerComma
 
     @Override
     public List<CommandArgument<?>> getArguments() {
-        List<CommandArgument<?>> arguments = new LinkedList<>();
+        List<CommandArgument<?>> arguments = super.getArguments();
 
         arguments.add(this.a);
 
@@ -28,6 +28,8 @@ public abstract class OptionalSingleServerCommand<A> extends AbstractServerComma
     }
 
     protected boolean constructArgs(CommandContext<ServerCommandSource> source, Single<A> single) throws CommandException, CommandSyntaxException {
+        if (!super.constructArgs(source)) return false;
+
         try {
             A aArg = (A) source.getArgument(this.a.name, Object.class);
 
@@ -48,7 +50,6 @@ public abstract class OptionalSingleServerCommand<A> extends AbstractServerComma
         if (this.constructArgs(source, single)) this.onOptionalCommand(source, single.getA());
     }
 
-    protected abstract void onOptionalCommand(CommandContext<ServerCommandSource> source) throws CommandException, CommandSyntaxException;
     protected abstract void onOptionalCommand(CommandContext<ServerCommandSource> source, A a) throws CommandException, CommandSyntaxException;
 
 }

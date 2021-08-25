@@ -1,6 +1,6 @@
 package dev.phonis.sharedwaypoints.server.commands.impl;
 
-import dev.phonis.sharedwaypoints.server.commands.IntermediateCommand;
+import dev.phonis.sharedwaypoints.server.commands.internal.IntermediateCommand;
 
 public class CommandWaypoint extends IntermediateCommand {
 

@@ -1,4 +1,4 @@
-package dev.phonis.sharedwaypoints.server.commands;
+package dev.phonis.sharedwaypoints.server.commands.internal;
 
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.context.CommandContext;

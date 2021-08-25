@@ -1,11 +1,10 @@
-package dev.phonis.sharedwaypoints.server.commands;
+package dev.phonis.sharedwaypoints.server.commands.internal;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
-import dev.phonis.sharedwaypoints.server.commands.impl.CommandWaypoint;
 import net.minecraft.server.command.ServerCommandSource;
 
 import java.util.ArrayList;
@@ -16,8 +15,8 @@ public class SWCommandManager {
 
     private static final List<IServerCommand> commands = new ArrayList<>();
 
-    static {
-        SWCommandManager.commands.add(new CommandWaypoint());
+    public static void addCommand(IServerCommand command) {
+        SWCommandManager.commands.add(command);
     }
 
     public static void registerCommands(CommandDispatcher<ServerCommandSource> dispatcher, boolean dedicated) {
