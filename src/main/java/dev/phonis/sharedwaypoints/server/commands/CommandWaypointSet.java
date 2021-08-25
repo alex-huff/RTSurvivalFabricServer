@@ -1,11 +1,10 @@
 package dev.phonis.sharedwaypoints.server.commands;
 
 import com.mojang.brigadier.context.CommandContext;
-import dev.phonis.sharedwaypoints.server.commands.internal.AbstractServerCommand;
 import dev.phonis.sharedwaypoints.server.commands.argument.IntegerCommandArgument;
 import dev.phonis.sharedwaypoints.server.commands.internal.OptionalTripleServerCommand;
+import dev.phonis.sharedwaypoints.server.commands.util.ContextUtil;
 import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.text.Text;
 
 public class CommandWaypointSet extends OptionalTripleServerCommand<Integer, Integer, Integer> {
 
@@ -21,22 +20,22 @@ public class CommandWaypointSet extends OptionalTripleServerCommand<Integer, Int
 
     @Override
     protected void onOptionalCommand(CommandContext<ServerCommandSource> source) {
-        source.getSource().getEntity().sendSystemMessage(Text.of("Called with no args"), AbstractServerCommand.systemUUID);
+        ContextUtil.sendMessage(source, "Called with no args");
     }
 
     @Override
     protected void onOptionalCommand(CommandContext<ServerCommandSource> source, Integer a) {
-        source.getSource().getEntity().sendSystemMessage(Text.of("Called with one args: " + a), AbstractServerCommand.systemUUID);
+        ContextUtil.sendMessage(source, "Called with one args: " + a);
     }
 
     @Override
     protected void onOptionalCommand(CommandContext<ServerCommandSource> source, Integer a, Integer b) {
-        source.getSource().getEntity().sendSystemMessage(Text.of("Called with two args: " + a + " " + b), AbstractServerCommand.systemUUID);
+        ContextUtil.sendMessage(source, "Called with two args: " + a + " " + b);
     }
 
     @Override
     protected void onOptionalCommand(CommandContext<ServerCommandSource> source, Integer a, Integer b, Integer c) {
-        source.getSource().getEntity().sendSystemMessage(Text.of("Called with three args: " + a + " " + b + " " + c), AbstractServerCommand.systemUUID);
+        ContextUtil.sendMessage(source, "Called with three args: " + a + " " + b + " " + c);
     }
 
 }

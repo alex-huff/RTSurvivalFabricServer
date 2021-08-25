@@ -4,18 +4,15 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import dev.phonis.sharedwaypoints.server.commands.exception.CommandException;
+import dev.phonis.sharedwaypoints.server.commands.util.ContextUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.text.Text;
 
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.UUID;
 
 public abstract class AbstractServerCommand implements IServerCommand {
-
-    protected static final UUID systemUUID = new UUID(0, 0);
 
     private final String name;
     private final List<String> aliases = new LinkedList<>();
@@ -60,7 +57,7 @@ public abstract class AbstractServerCommand implements IServerCommand {
             Entity entity = source.getSource().getEntity();
 
             if (entity != null)
-                source.getSource().getEntity().sendSystemMessage(Text.of(e.getMessage()), AbstractServerCommand.systemUUID);
+                ContextUtil.sendMessage(source, e.getMessage());
         }
 
         return Command.SINGLE_SUCCESS;

@@ -2,6 +2,7 @@ package dev.phonis.sharedwaypoints.server.commands.internal;
 
 import com.mojang.brigadier.context.CommandContext;
 import dev.phonis.sharedwaypoints.server.commands.argument.CommandArgument;
+import dev.phonis.sharedwaypoints.server.commands.util.ContextUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.command.ServerCommandSource;
 
@@ -21,11 +22,7 @@ public abstract class IntermediateCommand extends AbstractServerCommand {
 
     @Override
     public void onCommand(CommandContext<ServerCommandSource> source) {
-        Entity entity = source.getSource().getEntity();
-
-        if (entity == null) return;
-
-        entity.sendSystemMessage(this.getUsage(), AbstractServerCommand.systemUUID);
+        ContextUtil.sendMessage(source, this.getUsage());
     }
 
 }
