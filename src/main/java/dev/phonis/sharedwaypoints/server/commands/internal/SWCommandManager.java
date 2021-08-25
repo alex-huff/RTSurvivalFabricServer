@@ -5,6 +5,7 @@ import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
+import dev.phonis.sharedwaypoints.server.commands.argument.CommandArgument;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.minecraft.server.command.ServerCommandSource;
 
@@ -53,7 +54,7 @@ public class SWCommandManager {
             CommandArgument<?> commandArgument = arguments.get(i);
             RequiredArgumentBuilder<ServerCommandSource, ?> argumentBuilder = RequiredArgumentBuilder.argument(commandArgument.name, commandArgument.type);
 
-            argumentBuilder.executes(command::execute);
+            argumentBuilder.executes(commandArgument.executor);
             argumentBuilder.suggests(commandArgument);
 
             if (previous != null) {

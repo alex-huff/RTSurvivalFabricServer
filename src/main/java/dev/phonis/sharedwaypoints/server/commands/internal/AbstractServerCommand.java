@@ -3,6 +3,7 @@ package dev.phonis.sharedwaypoints.server.commands.internal;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import dev.phonis.sharedwaypoints.server.commands.exception.CommandException;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
@@ -49,8 +50,12 @@ public abstract class AbstractServerCommand implements IServerCommand {
 
     @Override
     public int execute(CommandContext<ServerCommandSource> source) {
+        return this.execute(source, this::onCommand);
+    }
+
+    protected int execute(CommandContext<ServerCommandSource> source, CommandExecutor<ServerCommandSource> executor) {
         try {
-            this.onCommand(source);
+            executor.accept(source);
         } catch (CommandException | CommandSyntaxException e) {
             Entity entity = source.getSource().getEntity();
 

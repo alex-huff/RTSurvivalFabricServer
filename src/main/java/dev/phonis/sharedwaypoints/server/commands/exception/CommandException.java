@@ -1,4 +1,4 @@
-package dev.phonis.sharedwaypoints.server.commands.internal;
+package dev.phonis.sharedwaypoints.server.commands.exception;
 
 import net.minecraft.util.Formatting;
 

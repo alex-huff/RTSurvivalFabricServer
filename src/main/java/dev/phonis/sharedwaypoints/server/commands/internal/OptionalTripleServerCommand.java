@@ -2,42 +2,30 @@ package dev.phonis.sharedwaypoints.server.commands.internal;
 
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import dev.phonis.sharedwaypoints.server.commands.util.Triple;
+import dev.phonis.sharedwaypoints.server.commands.argument.CommandArgument;
+import dev.phonis.sharedwaypoints.server.commands.exception.CommandException;
 import net.minecraft.server.command.ServerCommandSource;
 
 public abstract class OptionalTripleServerCommand<A, B, C> extends OptionalPairServerCommand<A, B> {
 
-    private final CommandArgument<C> c;
+    protected final CommandArgument<C> c;
 
     public OptionalTripleServerCommand(String name, CommandArgument<A> a, CommandArgument<B> b, CommandArgument<C> c) {
         super(name, a, b);
 
         this.c = c;
+        this.c.executor = source -> this.execute(source, this::passArgs);
 
         this.arguments.add(this.c);
     }
 
-    protected boolean constructArgs(CommandContext<ServerCommandSource> source, Triple<A, B, C> triple) throws CommandException, CommandSyntaxException {
-        if (!super.constructArgs(source, triple)) return false;
-
-        try {
-            C cArg = (C) source.getArgument(this.c.name, Object.class);
-
-            triple.setC(cArg);
-
-            return true;
-        } catch (IllegalArgumentException ignored) {
-            this.onOptionalCommand(source, triple.getA(), triple.getB());
-        }
-
-        return false;
-    }
-
-    @Override
-    public void onCommand(CommandContext<ServerCommandSource> source) throws CommandException, CommandSyntaxException {
-        Triple<A, B, C> triple = new Triple<>();
-
-        if (this.constructArgs(source, triple)) this.onOptionalCommand(source, triple.getA(), triple.getB(), triple.getC());
+    private void passArgs(CommandContext<ServerCommandSource> source) throws CommandException, CommandSyntaxException {
+        this.onOptionalCommand(
+            source,
+            (A) source.getArgument(this.a.name, Object.class),
+            (B) source.getArgument(this.b.name, Object.class),
+            (C) source.getArgument(this.c.name, Object.class)
+        );
     }
 
     protected abstract void onOptionalCommand(CommandContext<ServerCommandSource> source, A a, B b, C c) throws CommandException, CommandSyntaxException;

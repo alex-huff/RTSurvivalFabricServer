@@ -1,6 +1,7 @@
 package dev.phonis.sharedwaypoints.server.commands.internal;
 
 import com.mojang.brigadier.context.CommandContext;
+import dev.phonis.sharedwaypoints.server.commands.argument.CommandArgument;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
