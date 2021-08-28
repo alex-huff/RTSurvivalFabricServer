@@ -2,13 +2,11 @@ package dev.phonis.sharedwaypoints.server.networking;
 
 import static net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking.PlayChannelHandler;
 
-import dev.phonis.sharedwaypoints.server.networking.v1.Packets;
-import dev.phonis.sharedwaypoints.server.networking.v1.SWPacket;
-import dev.phonis.sharedwaypoints.server.networking.v1.SWRegister;
+import dev.phonis.sharedwaypoints.server.networking.protocol.persistant.Packets;
+import dev.phonis.sharedwaypoints.server.networking.protocol.persistant.SWRegister;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.ServerTask;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 
@@ -26,31 +24,28 @@ public class SWPlayHandler implements PlayChannelHandler {
 
         buf.getBytes(0, data);
 
-        try {
-            DataInputStream dis = new DataInputStream(new ByteArrayInputStream(data));
-            byte packetID = dis.readByte();
-            SWPacket packet = switch (packetID) {
-                case Packets.Out.SWRegisterID -> SWRegister.fromBytes(dis);
-                default -> null;
-            };
+        // can receive for the same player be called from multiple netty threads?
+        // if so, theoretically packets could be lost if registering has not been completed by
+        // the SWRegister receiver, synchronizing on player fixes this assuming SWRegister is the
+        // first packet sent to receive....
+        // this is probably not necessary but should not cause too much overhead
+        synchronized (player.getUuid()) {
+            try {
+                DataInputStream dis = new DataInputStream(new ByteArrayInputStream(data));
 
-            System.out.println("Read Thread: " + Thread.currentThread().getName() + " " + handler.player.getName().asString());
+                if (!SWNetworkManager.INSTANCE.handleIfSubscribed(server, player.getUuid(), dis)) {
+                    byte packetID = dis.readByte();
 
-            dis.close();
-            server.send(
-                new ServerTask(
-                    100,
-                    () -> this.handlePacket(server, responseSender, packet)
-                )
-            );
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+                    if (Packets.Out.SWRegisterID == packetID) {
+                        SWRegister register = SWRegister.fromBytes(dis);
 
-    private void handlePacket(MinecraftServer server, PacketSender responseSender, SWPacket packet) {
-        if (packet instanceof SWRegister register) {
-            System.out.println("Main Thread: " + Thread.currentThread().getName() + " " + register.protocolVersion);
+                        dis.close();
+                        SWNetworkManager.INSTANCE.subscribePlayer(server, player, register.protocolVersion);
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 

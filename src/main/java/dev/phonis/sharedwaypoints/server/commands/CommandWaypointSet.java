@@ -1,41 +1,30 @@
 package dev.phonis.sharedwaypoints.server.commands;
 
 import com.mojang.brigadier.context.CommandContext;
-import dev.phonis.sharedwaypoints.server.commands.argument.IntegerCommandArgument;
-import dev.phonis.sharedwaypoints.server.commands.internal.OptionalTripleServerCommand;
-import dev.phonis.sharedwaypoints.server.commands.util.ContextUtil;
+import dev.phonis.sharedwaypoints.server.commands.argument.StringCommandArgument;
+import dev.phonis.sharedwaypoints.server.commands.exception.CommandException;
+import dev.phonis.sharedwaypoints.server.commands.internal.OptionalSingleServerCommand;
+import dev.phonis.sharedwaypoints.server.waypoints.WaypointManager;
 import net.minecraft.server.command.ServerCommandSource;
 
-public class CommandWaypointSet extends OptionalTripleServerCommand<Integer, Integer, Integer> {
+public class CommandWaypointSet extends OptionalSingleServerCommand<String> {
 
     public CommandWaypointSet() {
         super(
             "set",
-            new IntegerCommandArgument("x"),
-            new IntegerCommandArgument("y"),
-            new IntegerCommandArgument("z")
+            new StringCommandArgument("name")
         );
         this.addAliases("s");
     }
 
     @Override
-    protected void onOptionalCommand(CommandContext<ServerCommandSource> source) {
-        ContextUtil.sendMessage(source, "Called with no args");
+    protected void onOptionalCommand(CommandContext<ServerCommandSource> source) throws CommandException {
+        throw new CommandException("You must provide a waypoint name.");
     }
 
     @Override
-    protected void onOptionalCommand(CommandContext<ServerCommandSource> source, Integer a) {
-        ContextUtil.sendMessage(source, "Called with one args: " + a);
-    }
-
-    @Override
-    protected void onOptionalCommand(CommandContext<ServerCommandSource> source, Integer a, Integer b) {
-        ContextUtil.sendMessage(source, "Called with two args: " + a + " " + b);
-    }
-
-    @Override
-    protected void onOptionalCommand(CommandContext<ServerCommandSource> source, Integer a, Integer b, Integer c) {
-        ContextUtil.sendMessage(source, "Called with three args: " + a + " " + b + " " + c);
+    protected void onOptionalCommand(CommandContext<ServerCommandSource> source, String s) {
+        WaypointManager.INSTANCE.addWaypoint(source, s);
     }
 
 }

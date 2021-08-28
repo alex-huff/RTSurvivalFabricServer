@@ -1,4 +1,4 @@
-package dev.phonis.sharedwaypoints.server.networking.v1;
+package dev.phonis.sharedwaypoints.server.networking.protocol.persistant;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
