@@ -13,6 +13,7 @@ public class SharedWaypointsServer implements DedicatedServerModInitializer {
 
 	public static final Identifier sWIdentifier = new Identifier("sharedwaypoints:main");
 	public static final int maxSupportedProtocolVersion = 1;
+	public static final String configDirectory = "config/sharedwaypoints/";
 
 	@Override
 	public void onInitializeServer() {

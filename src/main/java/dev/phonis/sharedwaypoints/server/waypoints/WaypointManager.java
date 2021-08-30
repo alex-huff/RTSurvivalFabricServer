@@ -1,39 +1,35 @@
 package dev.phonis.sharedwaypoints.server.waypoints;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
 import com.mojang.brigadier.context.CommandContext;
+import dev.phonis.sharedwaypoints.server.SharedWaypointsServer;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3d;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.io.FileReader;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class WaypointManager {
 
-    public static final WaypointManager INSTANCE = new WaypointManager();
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    public static final String waypointFile = SharedWaypointsServer.configDirectory + "waypoints.json";
+    public static final String backupDirectory = SharedWaypointsServer.configDirectory + "backup/";
+    public static final WaypointManager INSTANCE = WaypointManager.load();
     public static final Identifier worldIdentifier = new Identifier("minecraft", "overworld");
     public static final Identifier netherIdentifier = new Identifier("minecraft", "the_nether");
     public static final Identifier endIdentifier = new Identifier("minecraft", "the_end");
 
     private final Map<String, Waypoint> waypointMap = new HashMap<>();
-
-    static {
-        WaypointManager.INSTANCE.waypointMap.put(
-            "test",
-            new Waypoint(
-                "test",
-                WaypointManager.worldIdentifier,
-                0,
-                0,
-                0
-            )
-        );
-    }
 
     public void forEachWaypoint(Consumer<Waypoint> consumer) {
         this.waypointMap.values().forEach(consumer);
@@ -49,7 +45,11 @@ public class WaypointManager {
     }
 
     public Waypoint removeWaypoint(String name) {
-        return this.waypointMap.remove(name);
+        Waypoint waypoint = this.waypointMap.remove(name);
+
+        this.trySave();
+
+        return waypoint;
     }
 
     public Waypoint addWaypoint(CommandContext<ServerCommandSource> source, String name) {
@@ -63,6 +63,7 @@ public class WaypointManager {
         );
 
         this.waypointMap.put(name, waypoint);
+        this.trySave();
 
         return waypoint;
     }
@@ -71,6 +72,7 @@ public class WaypointManager {
         Waypoint toUpdate = this.waypointMap.get(s);
 
         toUpdate.update(position, world.getRegistryKey().getValue());
+        this.trySave();
 
         return toUpdate;
     }
@@ -81,6 +83,55 @@ public class WaypointManager {
 
     public int numWaypoints() {
         return this.waypointMap.size();
+    }
+
+    private static WaypointManager load() {
+        if (Files.exists(Path.of(WaypointManager.waypointFile))) {
+            try (FileReader reader = new FileReader(WaypointManager.waypointFile)) {
+                WaypointManager.backup();
+
+                return GSON.fromJson(reader, WaypointManager.class);
+            } catch (IOException | JsonSyntaxException e) {
+                System.out.println("Could not read waypoints.");
+            }
+        }
+
+        return new WaypointManager();
+    }
+
+    public static void backup() throws IOException {
+        Path path = Path.of(WaypointManager.waypointFile);
+        Path backupPath = Path.of(WaypointManager.backupDirectory + path.getFileName() + UUID.randomUUID().toString().replaceAll("-", "") + ".backup");
+        Path parent = backupPath.getParent();
+
+        if (!Files.exists(parent)) {
+            Files.createDirectories(parent);
+        }
+
+        Files.copy(path, backupPath, StandardCopyOption.REPLACE_EXISTING);
+    }
+
+    public void saveToFile() throws IOException {
+        Path path = Path.of(WaypointManager.waypointFile);
+        Path parent = path.getParent();
+
+        if (!Files.exists(parent)) {
+            Files.createDirectories(parent);
+        }
+
+        // Atomic file replace
+        Path tempPath = path.resolveSibling(path.getFileName() + ".tmp");
+
+        Files.writeString(tempPath, GSON.toJson(this));
+        Files.move(tempPath, path, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
+    }
+
+    public void trySave() {
+        try {
+            this.saveToFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 }
