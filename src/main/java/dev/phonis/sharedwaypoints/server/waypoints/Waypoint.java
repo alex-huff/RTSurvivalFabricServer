@@ -1,11 +1,12 @@
 package dev.phonis.sharedwaypoints.server.waypoints;
 
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Vec3d;
 
 public class Waypoint {
 
     private final String name;
-    private final Identifier world;
+    private Identifier world;
     private double xPos;
     private double yPos;
     private double zPos;
@@ -36,6 +37,13 @@ public class Waypoint {
 
     public double getZ() {
         return this.zPos;
+    }
+
+    public void update(Vec3d position, Identifier world) {
+        this.xPos = position.x;
+        this.yPos = position.y;
+        this.zPos = position.z;
+        this.world = world;
     }
 
 }

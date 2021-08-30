@@ -40,7 +40,7 @@ public class SWPlayHandler implements PlayChannelHandler {
                         SWRegister register = SWRegister.fromBytes(dis);
 
                         dis.close();
-                        SWNetworkManager.INSTANCE.subscribePlayer(server, player, register.protocolVersion);
+                        SWNetworkManager.INSTANCE.subscribePlayer(server, player, responseSender, register.protocolVersion);
                     }
                 }
             } catch (IOException e) {

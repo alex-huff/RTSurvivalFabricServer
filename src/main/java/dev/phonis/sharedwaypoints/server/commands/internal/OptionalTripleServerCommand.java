@@ -14,7 +14,7 @@ public abstract class OptionalTripleServerCommand<A, B, C> extends OptionalPairS
         super(name, a, b);
 
         this.c = c;
-        this.c.executor = source -> this.execute(source, this::passArgs);
+        this.c.setExecutor(source -> this.execute(source, this::passArgs));
 
         this.arguments.add(this.c);
     }

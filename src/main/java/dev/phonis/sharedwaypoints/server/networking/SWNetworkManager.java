@@ -1,15 +1,19 @@
 package dev.phonis.sharedwaypoints.server.networking;
 
+import com.mojang.brigadier.context.CommandContext;
 import dev.phonis.sharedwaypoints.server.SharedWaypointsServer;
 import dev.phonis.sharedwaypoints.server.networking.protocol.action.SWAction;
 import dev.phonis.sharedwaypoints.server.networking.protocol.action.SWWaypointInitializeAction;
 import dev.phonis.sharedwaypoints.server.networking.protocol.persistant.SWPacket;
+import dev.phonis.sharedwaypoints.server.networking.protocol.persistant.SWUnsupported;
 import dev.phonis.sharedwaypoints.server.networking.protocol.v1.V1ProtocolAdapter;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.PlayerManager;
+import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.jetbrains.annotations.Nullable;
 
@@ -40,44 +44,48 @@ public class SWNetworkManager {
         return packetBuffer;
     }
 
+    public void sendToSubscribed(CommandContext<ServerCommandSource> source, SWAction action) {
+        this.sendToSubscribed(source.getSource().getServer().getPlayerManager(), action);
+    }
+
     // should be called from Server Thread
     public void sendToSubscribed(PlayerManager playerManager, SWAction action) {
         // although iteration over the hashmap does not guarantee that no modifications are made
         // during the iteration, the iterator should display that state of the map at the time
         // of its creation, making this safe
         for (Map.Entry<UUID, ProtocolAdapter> entry : this.subscribedPlayers.entrySet()) {
-            UUID uuid = entry.getKey();
-            ProtocolAdapter adapter = entry.getValue();
-            ServerPlayerEntity player = playerManager.getPlayer(uuid);
-
-            if (adapter == null || player == null) {
-                continue;
-            }
-
-            this.sendToPlayer(adapter, player, action);
+            this.sendToPlayer(entry.getValue(), playerManager.getPlayer(entry.getKey()), action);
         }
     }
 
     // should be called from Server Thread
     public void sendIfSubscribed(ServerPlayerEntity player, SWAction action) {
-        ProtocolAdapter adapter = this.subscribedPlayers.get(player.getUuid());
-
-        if (adapter == null) return;
-
-        this.sendToPlayer(adapter, player, action);
+        this.sendToPlayer(this.subscribedPlayers.get(player.getUuid()), player, action);
     }
 
     private void sendToPlayer(ProtocolAdapter adapter, @Nullable ServerPlayerEntity player, SWAction action) {
-        if (player == null) return;
+        if (player == null || adapter == null) return;
 
-        SWPacket packet = adapter.fromAction(action);
+        this.sendPacketToPlayer(player, adapter.fromAction(action));
+    }
 
+    private void sendPacketToPlayer(ServerPlayerEntity player, SWPacket packet) {
         try {
-            player.networkHandler.sendPacket(
-                ServerPlayNetworking.createS2CPacket(
-                    SharedWaypointsServer.sWIdentifier,
-                    SWNetworkManager.packetToByteBuf(packet)
-                )
+            ServerPlayNetworking.send(
+                player,
+                SharedWaypointsServer.sWIdentifier,
+                SWNetworkManager.packetToByteBuf(packet)
+            );
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void sendPacketToSender(PacketSender sender, SWPacket packet) {
+        try {
+            sender.sendPacket(
+                SharedWaypointsServer.sWIdentifier,
+                SWNetworkManager.packetToByteBuf(packet)
             );
         } catch (IOException e) {
             e.printStackTrace();
@@ -106,7 +114,7 @@ public class SWNetworkManager {
         return false;
     }
 
-    public void subscribePlayer(MinecraftServer server, ServerPlayerEntity player, int protocolVersion) {
+    public void subscribePlayer(MinecraftServer server, ServerPlayerEntity player, PacketSender responseSender, int protocolVersion) {
         ProtocolAdapter adapter = switch (protocolVersion) {
             case 1 -> V1ProtocolAdapter.INSTANCE;
             default -> null;
@@ -149,6 +157,8 @@ public class SWNetworkManager {
 
             // TLDR; currently it is feasible for the client to be told to remove or update a waypoint BEFORE
             // waypoints have been sent to the client. It is the client's responsibility to fail gracefully.
+        } else {
+            this.sendPacketToSender(responseSender, new SWUnsupported(SharedWaypointsServer.maxSupportedProtocolVersion));
         }
     }
 

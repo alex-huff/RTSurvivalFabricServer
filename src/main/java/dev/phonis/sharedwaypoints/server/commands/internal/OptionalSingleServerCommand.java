@@ -14,7 +14,7 @@ public abstract class OptionalSingleServerCommand<A> extends NoArgServerCommand 
         super(name);
 
         this.a = a;
-        this.a.executor = source -> this.execute(source, this::passArgs);
+        this.a.setExecutor(source -> this.execute(source, this::passArgs));
 
         this.arguments.add(this.a);
     }

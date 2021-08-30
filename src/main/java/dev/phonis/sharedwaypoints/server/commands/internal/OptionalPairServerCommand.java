@@ -14,7 +14,7 @@ public abstract class OptionalPairServerCommand<A, B> extends OptionalSingleServ
         super(name, a);
 
         this.b = b;
-        this.b.executor = source -> this.execute(source, this::passArgs);
+        this.b.setExecutor(source -> this.execute(source, this::passArgs));
 
         this.arguments.add(this.b);
     }

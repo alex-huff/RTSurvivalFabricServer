@@ -9,7 +9,7 @@ public abstract class CommandArgument<T> implements SuggestionProvider<ServerCom
 
     public final String name;
     public final ArgumentType<T> type;
-    public Command<ServerCommandSource> executor; // set by command
+    private Command<ServerCommandSource> executor; // set by command
 
     public CommandArgument(String name, ArgumentType<T> type) {
         this.name = name;
@@ -20,6 +20,10 @@ public abstract class CommandArgument<T> implements SuggestionProvider<ServerCom
         this.executor = executor;
 
         return this;
+    }
+
+    public Command<ServerCommandSource> getExecutor() {
+        return this.executor;
     }
 
 }

@@ -12,6 +12,7 @@ import net.minecraft.util.Identifier;
 public class SharedWaypointsServer implements DedicatedServerModInitializer {
 
 	public static final Identifier sWIdentifier = new Identifier("sharedwaypoints:main");
+	public static final int maxSupportedProtocolVersion = 1;
 
 	@Override
 	public void onInitializeServer() {

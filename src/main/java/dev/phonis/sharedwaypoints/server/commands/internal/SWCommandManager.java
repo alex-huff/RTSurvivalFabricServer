@@ -54,7 +54,7 @@ public class SWCommandManager {
             CommandArgument<?> commandArgument = arguments.get(i);
             RequiredArgumentBuilder<ServerCommandSource, ?> argumentBuilder = RequiredArgumentBuilder.argument(commandArgument.name, commandArgument.type);
 
-            argumentBuilder.executes(commandArgument.executor);
+            argumentBuilder.executes(commandArgument.getExecutor());
             argumentBuilder.suggests(commandArgument);
 
             if (previous != null) {

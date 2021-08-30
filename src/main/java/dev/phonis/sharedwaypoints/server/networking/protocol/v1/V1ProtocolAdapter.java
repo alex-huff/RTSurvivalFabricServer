@@ -3,6 +3,8 @@ package dev.phonis.sharedwaypoints.server.networking.protocol.v1;
 import dev.phonis.sharedwaypoints.server.networking.ProtocolAdapter;
 import dev.phonis.sharedwaypoints.server.networking.protocol.action.SWAction;
 import dev.phonis.sharedwaypoints.server.networking.protocol.action.SWWaypointInitializeAction;
+import dev.phonis.sharedwaypoints.server.networking.protocol.action.SWWaypointRemoveAction;
+import dev.phonis.sharedwaypoints.server.networking.protocol.action.SWWaypointUpdateAction;
 import dev.phonis.sharedwaypoints.server.networking.protocol.persistant.SWPacket;
 import dev.phonis.sharedwaypoints.server.waypoints.Waypoint;
 import dev.phonis.sharedwaypoints.server.waypoints.WaypointManager;
@@ -22,16 +24,22 @@ public class V1ProtocolAdapter implements ProtocolAdapter {
     }
 
     @Override
-    public SWPacket fromAction(SWAction action) {
-        if (action instanceof SWWaypointInitializeAction) {
-            List<V1SWWaypoint> waypoints = new ArrayList<>();
+    public SWPacket fromWaypointInitialize(SWWaypointInitializeAction action) {
+        List<V1SWWaypoint> waypoints = new ArrayList<>();
 
-            WaypointManager.INSTANCE.forEachWaypoint(waypoint -> waypoints.add(this.fromWaypoint(waypoint)));
+        WaypointManager.INSTANCE.forEachWaypoint(waypoint -> waypoints.add(this.fromWaypoint(waypoint)));
 
-            return new V1SWWaypointInitialize(waypoints);
-        }
+        return new V1SWWaypointInitialize(waypoints);
+    }
 
-        return null;
+    @Override
+    public SWPacket fromWaypointUpdate(SWWaypointUpdateAction action) {
+        return new V1SWWaypointUpdate(this.fromWaypoint(action.waypoint));
+    }
+
+    @Override
+    public SWPacket fromWaypointRemove(SWWaypointRemoveAction action) {
+        return new V1SWWaypointRemove(action.name);
     }
 
     private V1SWWaypoint fromWaypoint(Waypoint waypoint) {

@@ -6,8 +6,11 @@ public class CommandWaypoint extends IntermediateCommand {
 
     public CommandWaypoint() {
         super("waypoint");
-        this.addAliases("wp");
+        this.addAlias("wp");
         this.addSubCommand(new CommandWaypointSet());
+        this.addSubCommand(new CommandWaypointRemove());
+        this.addSubCommand(new CommandWaypointUpdate());
+        this.addSubCommand(new CommandWaypointList());
     }
 
 }

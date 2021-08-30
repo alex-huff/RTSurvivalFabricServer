@@ -22,7 +22,7 @@ public abstract class AbstractServerCommand implements IServerCommand {
         this.name = name;
     }
 
-    protected void addAliases(String alias) {
+    protected void addAlias(String alias) {
         this.aliases.add(alias);
     }
 

@@ -4,8 +4,13 @@ import com.mojang.brigadier.context.CommandContext;
 import dev.phonis.sharedwaypoints.server.commands.argument.StringCommandArgument;
 import dev.phonis.sharedwaypoints.server.commands.exception.CommandException;
 import dev.phonis.sharedwaypoints.server.commands.internal.OptionalSingleServerCommand;
+import dev.phonis.sharedwaypoints.server.commands.util.ContextUtil;
+import dev.phonis.sharedwaypoints.server.networking.SWNetworkManager;
+import dev.phonis.sharedwaypoints.server.networking.protocol.action.SWWaypointUpdateAction;
+import dev.phonis.sharedwaypoints.server.waypoints.Waypoint;
 import dev.phonis.sharedwaypoints.server.waypoints.WaypointManager;
 import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.util.Formatting;
 
 public class CommandWaypointSet extends OptionalSingleServerCommand<String> {
 
@@ -14,7 +19,7 @@ public class CommandWaypointSet extends OptionalSingleServerCommand<String> {
             "set",
             new StringCommandArgument("name")
         );
-        this.addAliases("s");
+        this.addAlias("s");
     }
 
     @Override
@@ -24,7 +29,19 @@ public class CommandWaypointSet extends OptionalSingleServerCommand<String> {
 
     @Override
     protected void onOptionalCommand(CommandContext<ServerCommandSource> source, String s) {
-        WaypointManager.INSTANCE.addWaypoint(source, s);
+        Waypoint waypoint = WaypointManager.INSTANCE.addWaypoint(source, s);
+
+        ContextUtil.sendMessage(
+            source,
+            Formatting.WHITE + "Waypoint '" +
+            Formatting.AQUA + waypoint.getName() +
+            Formatting.WHITE + "' ➤ " + Formatting.GRAY +
+            waypoint.getWorld().getPath() + " " + Formatting.GRAY +
+                (int) waypoint.getX() + " " +
+                (int) waypoint.getY() + " " +
+                (int) waypoint.getZ()
+        );
+        SWNetworkManager.INSTANCE.sendToSubscribed(source, new SWWaypointUpdateAction(waypoint));
     }
 
 }
