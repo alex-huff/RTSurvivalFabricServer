@@ -36,7 +36,7 @@ public class CommandWaypointSet extends OptionalSingleServerCommand<String> {
             Formatting.WHITE + "Waypoint '" +
             Formatting.AQUA + waypoint.getName() +
             Formatting.WHITE + "' ➤ " + Formatting.GRAY +
-            waypoint.getWorld().getPath() + " " + Formatting.GRAY +
+            waypoint.getWorld() + " " + Formatting.GRAY +
                 (int) waypoint.getX() + " " +
                 (int) waypoint.getY() + " " +
                 (int) waypoint.getZ()

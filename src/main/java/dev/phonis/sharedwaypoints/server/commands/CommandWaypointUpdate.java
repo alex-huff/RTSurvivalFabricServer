@@ -57,7 +57,7 @@ public class CommandWaypointUpdate extends OptionalPairServerCommand<String, Pos
             source,
             Formatting.WHITE +
                 "Position of '" + Formatting.AQUA + waypoint.getName() + Formatting.WHITE + "' ➤ " +
-                Formatting.AQUA + waypoint.getWorld().getPath() + Formatting.WHITE + " ➤ " + Formatting.GRAY +
+                Formatting.AQUA + waypoint.getWorld() + Formatting.WHITE + " ➤ " + Formatting.GRAY +
                 (int) waypoint.getX() + ", " +
                 (int) waypoint.getY() + ", " +
                 (int) waypoint.getZ()

@@ -7,7 +7,6 @@ import com.mojang.brigadier.context.CommandContext;
 import dev.phonis.sharedwaypoints.server.SharedWaypointsServer;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3d;
 
 import java.io.FileReader;
@@ -25,9 +24,9 @@ public class WaypointManager {
     public static final String waypointFile = SharedWaypointsServer.configDirectory + "waypoints.json";
     public static final String backupDirectory = SharedWaypointsServer.configDirectory + "backup/";
     public static final WaypointManager INSTANCE = WaypointManager.load();
-    public static final Identifier worldIdentifier = new Identifier("minecraft", "overworld");
-    public static final Identifier netherIdentifier = new Identifier("minecraft", "the_nether");
-    public static final Identifier endIdentifier = new Identifier("minecraft", "the_end");
+    public static final String worldIdentifier = "overworld";
+    public static final String netherIdentifier = "the_nether";
+    public static final String endIdentifier = "the_end";
 
     private final Map<String, Waypoint> waypointMap = new HashMap<>();
 
@@ -56,7 +55,7 @@ public class WaypointManager {
         Vec3d position = source.getSource().getPosition();
         Waypoint waypoint = new Waypoint(
             name,
-            source.getSource().getWorld().getRegistryKey().getValue(),
+            source.getSource().getWorld().getRegistryKey().getValue().getPath(),
             position.getX(),
             position.getY(),
             position.getZ()
@@ -71,7 +70,7 @@ public class WaypointManager {
     public Waypoint updateWaypoint(String s, Vec3d position, ServerWorld world) {
         Waypoint toUpdate = this.waypointMap.get(s);
 
-        toUpdate.update(position, world.getRegistryKey().getValue());
+        toUpdate.update(position, world.getRegistryKey().getValue().getPath());
         this.trySave();
 
         return toUpdate;

@@ -1,7 +1,6 @@
 package dev.phonis.sharedwaypoints.server.commands;
 
 import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import dev.phonis.sharedwaypoints.server.commands.argument.WaypointCommandArgument;
 import dev.phonis.sharedwaypoints.server.commands.exception.CommandException;
 import dev.phonis.sharedwaypoints.server.commands.internal.OptionalSingleServerCommand;

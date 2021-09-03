@@ -28,7 +28,7 @@ public class CommandWaypointList extends NoArgServerCommand {
             (waypoint, isLast) -> {
                 messageBuilder.append(Formatting.AQUA).append(waypoint.getName()).append(Formatting.WHITE)
                     .append(" ➤ ").append(Formatting.GRAY)
-                    .append(waypoint.getWorld().getPath()).append(" ")
+                    .append(waypoint.getWorld()).append(" ")
                     .append((int) waypoint.getX()).append(" ")
                     .append((int) waypoint.getY()).append(" ")
                     .append((int) waypoint.getZ());
