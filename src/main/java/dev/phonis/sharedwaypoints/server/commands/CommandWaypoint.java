@@ -2,9 +2,11 @@ package dev.phonis.sharedwaypoints.server.commands;
 
 import dev.phonis.sharedwaypoints.server.commands.internal.IntermediateCommand;
 
-public class CommandWaypoint extends IntermediateCommand {
+public class CommandWaypoint extends IntermediateCommand
+{
 
-    public CommandWaypoint() {
+    public CommandWaypoint()
+    {
         super("waypoint");
         this.addAlias("wp");
         this.addSubCommand(new CommandWaypointSet());

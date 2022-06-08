@@ -12,9 +12,11 @@ import dev.phonis.sharedwaypoints.server.waypoints.WaypointManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.util.Formatting;
 
-public class CommandWaypointRemove extends OptionalSingleServerCommand<String> {
+public class CommandWaypointRemove extends OptionalSingleServerCommand<String>
+{
 
-    public CommandWaypointRemove() {
+    public CommandWaypointRemove()
+    {
         super(
             "remove",
             new WaypointCommandArgument("waypoint")
@@ -23,24 +25,27 @@ public class CommandWaypointRemove extends OptionalSingleServerCommand<String> {
     }
 
     @Override
-    protected void onOptionalCommand(CommandContext<ServerCommandSource> source) throws CommandException {
+    protected void onOptionalCommand(CommandContext<ServerCommandSource> source) throws CommandException
+    {
         throw new CommandException("You must provide a waypoint name.");
     }
 
     @Override
-    protected void onOptionalCommand(CommandContext<ServerCommandSource> source, String s) throws CommandException {
+    protected void onOptionalCommand(CommandContext<ServerCommandSource> source, String s) throws CommandException
+    {
         Waypoint waypoint = WaypointManager.INSTANCE.removeWaypoint(s);
 
-        if (waypoint == null) {
+        if (waypoint == null)
+        {
             throw new CommandException("Invalid waypoint for removal.");
         }
 
         ContextUtil.sendMessage(
             source,
             Formatting.WHITE +
-                "Waypoint '" +
-                Formatting.AQUA + waypoint.getName() + Formatting.WHITE +
-                "' removed."
+            "Waypoint '" +
+            Formatting.AQUA + waypoint.getName() + Formatting.WHITE +
+            "' removed."
         );
         SWNetworkManager.INSTANCE.sendToSubscribed(source, new SWWaypointRemoveAction(waypoint.getName()));
     }

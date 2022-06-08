@@ -12,9 +12,11 @@ import dev.phonis.sharedwaypoints.server.waypoints.WaypointManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.util.Formatting;
 
-public class CommandWaypointSet extends OptionalSingleServerCommand<String> {
+public class CommandWaypointSet extends OptionalSingleServerCommand<String>
+{
 
-    public CommandWaypointSet() {
+    public CommandWaypointSet()
+    {
         super(
             "set",
             new StringCommandArgument("name")
@@ -23,12 +25,14 @@ public class CommandWaypointSet extends OptionalSingleServerCommand<String> {
     }
 
     @Override
-    protected void onOptionalCommand(CommandContext<ServerCommandSource> source) throws CommandException {
+    protected void onOptionalCommand(CommandContext<ServerCommandSource> source) throws CommandException
+    {
         throw new CommandException("You must provide a waypoint name.");
     }
 
     @Override
-    protected void onOptionalCommand(CommandContext<ServerCommandSource> source, String s) {
+    protected void onOptionalCommand(CommandContext<ServerCommandSource> source, String s)
+    {
         Waypoint waypoint = WaypointManager.INSTANCE.addWaypoint(source, s);
 
         ContextUtil.sendMessage(
@@ -37,9 +41,9 @@ public class CommandWaypointSet extends OptionalSingleServerCommand<String> {
             Formatting.AQUA + waypoint.getName() +
             Formatting.WHITE + "' ➤ " + Formatting.GRAY +
             waypoint.getWorld() + " " + Formatting.GRAY +
-                (int) waypoint.getX() + " " +
-                (int) waypoint.getY() + " " +
-                (int) waypoint.getZ()
+            (int) waypoint.getX() + " " +
+            (int) waypoint.getY() + " " +
+            (int) waypoint.getZ()
         );
         SWNetworkManager.INSTANCE.sendToSubscribed(source, new SWWaypointUpdateAction(waypoint));
     }

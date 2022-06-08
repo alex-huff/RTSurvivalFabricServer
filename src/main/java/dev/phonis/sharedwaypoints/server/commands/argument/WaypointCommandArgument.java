@@ -9,16 +9,21 @@ import dev.phonis.sharedwaypoints.server.waypoints.WaypointManager;
 
 import java.util.concurrent.CompletableFuture;
 
-public class WaypointCommandArgument extends CommandArgument<String> {
+public class WaypointCommandArgument extends CommandArgument<String>
+{
 
-    public WaypointCommandArgument(String name) {
+    public WaypointCommandArgument(String name)
+    {
         super(name, StringArgumentType.word());
     }
 
     @Override
-    public CompletableFuture<Suggestions> getSuggestions(CommandContext context, SuggestionsBuilder builder) throws CommandSyntaxException {
+    public CompletableFuture<Suggestions> getSuggestions(CommandContext context, SuggestionsBuilder builder)
+        throws CommandSyntaxException
+    {
         WaypointManager.INSTANCE.forEachWaypoint(
-            waypoint -> {
+            waypoint ->
+            {
                 if (waypoint.getName().startsWith(builder.getRemaining())) builder.suggest(waypoint.getName());
             }
         );

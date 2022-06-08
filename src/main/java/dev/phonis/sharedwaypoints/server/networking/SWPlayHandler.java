@@ -14,12 +14,17 @@ import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 
-public class SWPlayHandler implements PlayChannelHandler {
+public class SWPlayHandler implements PlayChannelHandler
+{
 
     public static final SWPlayHandler INSTANCE = new SWPlayHandler();
 
     @Override
-    public void receive(MinecraftServer server, ServerPlayerEntity player, ServerPlayNetworkHandler handler, PacketByteBuf buf, PacketSender responseSender) {
+    public void receive(
+        MinecraftServer server, ServerPlayerEntity player, ServerPlayNetworkHandler handler, PacketByteBuf buf,
+        PacketSender responseSender
+    )
+    {
         byte[] data = new byte[buf.readableBytes()];
 
         buf.getBytes(0, data);
@@ -29,21 +34,28 @@ public class SWPlayHandler implements PlayChannelHandler {
         // the SWRegister receiver, synchronizing on player fixes this assuming SWRegister is the
         // first packet sent to receive....
         // this is probably not necessary but should not cause too much overhead
-        synchronized (player.getUuid()) {
-            try {
+        synchronized (player.getUuid())
+        {
+            try
+            {
                 DataInputStream dis = new DataInputStream(new ByteArrayInputStream(data));
 
-                if (!SWNetworkManager.INSTANCE.handleIfSubscribed(server, player.getUuid(), dis)) {
+                if (!SWNetworkManager.INSTANCE.handleIfSubscribed(server, player.getUuid(), dis))
+                {
                     byte packetID = dis.readByte();
 
-                    if (Packets.Out.SWRegisterID == packetID) {
+                    if (Packets.Out.SWRegisterID == packetID)
+                    {
                         SWRegister register = SWRegister.fromBytes(dis);
 
                         dis.close();
-                        SWNetworkManager.INSTANCE.subscribePlayer(server, player, responseSender, register.protocolVersion);
+                        SWNetworkManager.INSTANCE.subscribePlayer(
+                            server, player, responseSender, register.protocolVersion);
                     }
                 }
-            } catch (IOException e) {
+            }
+            catch (IOException e)
+            {
                 e.printStackTrace();
             }
         }

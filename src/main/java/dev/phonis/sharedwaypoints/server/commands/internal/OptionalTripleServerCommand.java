@@ -6,11 +6,13 @@ import dev.phonis.sharedwaypoints.server.commands.argument.CommandArgument;
 import dev.phonis.sharedwaypoints.server.commands.exception.CommandException;
 import net.minecraft.server.command.ServerCommandSource;
 
-public abstract class OptionalTripleServerCommand<A, B, C> extends OptionalPairServerCommand<A, B> {
+public abstract class OptionalTripleServerCommand<A, B, C> extends OptionalPairServerCommand<A, B>
+{
 
     protected final CommandArgument<C> c;
 
-    public OptionalTripleServerCommand(String name, CommandArgument<A> a, CommandArgument<B> b, CommandArgument<C> c) {
+    public OptionalTripleServerCommand(String name, CommandArgument<A> a, CommandArgument<B> b, CommandArgument<C> c)
+    {
         super(name, a, b);
 
         this.c = c;
@@ -19,7 +21,8 @@ public abstract class OptionalTripleServerCommand<A, B, C> extends OptionalPairS
         this.arguments.add(this.c);
     }
 
-    private void passArgs(CommandContext<ServerCommandSource> source) throws CommandException, CommandSyntaxException {
+    private void passArgs(CommandContext<ServerCommandSource> source) throws CommandException, CommandSyntaxException
+    {
         this.onOptionalCommand(
             source,
             (A) source.getArgument(this.a.name, Object.class),
@@ -28,6 +31,7 @@ public abstract class OptionalTripleServerCommand<A, B, C> extends OptionalPairS
         );
     }
 
-    protected abstract void onOptionalCommand(CommandContext<ServerCommandSource> source, A a, B b, C c) throws CommandException, CommandSyntaxException;
+    protected abstract void onOptionalCommand(CommandContext<ServerCommandSource> source, A a, B b, C c)
+        throws CommandException, CommandSyntaxException;
 
 }

@@ -25,16 +25,18 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class SWNetworkManager {
+public class SWNetworkManager
+{
 
     public static final SWNetworkManager INSTANCE = new SWNetworkManager();
 
     private final Map<UUID, ProtocolAdapter> subscribedPlayers = new ConcurrentHashMap<>();
 
-    private static PacketByteBuf packetToByteBuf(SWPacket packet) throws IOException {
+    private static PacketByteBuf packetToByteBuf(SWPacket packet) throws IOException
+    {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        DataOutputStream das = new DataOutputStream(baos);
-        PacketByteBuf packetBuffer = PacketByteBufs.create();
+        DataOutputStream      das = new DataOutputStream(baos);
+        PacketByteBuf         packetBuffer = PacketByteBufs.create();
 
         das.writeByte(packet.getID());
         packet.toBytes(das);
@@ -44,69 +46,90 @@ public class SWNetworkManager {
         return packetBuffer;
     }
 
-    public void sendToSubscribed(CommandContext<ServerCommandSource> source, SWAction action) {
+    public void sendToSubscribed(CommandContext<ServerCommandSource> source, SWAction action)
+    {
         this.sendToSubscribed(source.getSource().getServer().getPlayerManager(), action);
     }
 
     // should be called from Server Thread
-    public void sendToSubscribed(PlayerManager playerManager, SWAction action) {
+    public void sendToSubscribed(PlayerManager playerManager, SWAction action)
+    {
         // although iteration over the hashmap does not guarantee that no modifications are made
         // during the iteration, the iterator should display that state of the map at the time
         // of its creation, making this safe
-        for (Map.Entry<UUID, ProtocolAdapter> entry : this.subscribedPlayers.entrySet()) {
+        for (Map.Entry<UUID, ProtocolAdapter> entry : this.subscribedPlayers.entrySet())
+        {
             this.sendToPlayer(entry.getValue(), playerManager.getPlayer(entry.getKey()), action);
         }
     }
 
     // should be called from Server Thread
-    public void sendIfSubscribed(ServerPlayerEntity player, SWAction action) {
+    public void sendIfSubscribed(ServerPlayerEntity player, SWAction action)
+    {
         this.sendToPlayer(this.subscribedPlayers.get(player.getUuid()), player, action);
     }
 
-    private void sendToPlayer(ProtocolAdapter adapter, @Nullable ServerPlayerEntity player, SWAction action) {
+    private void sendToPlayer(ProtocolAdapter adapter, @Nullable ServerPlayerEntity player, SWAction action)
+    {
         if (player == null || adapter == null) return;
 
         this.sendPacketToPlayer(player, adapter.fromAction(action));
     }
 
-    private void sendPacketToPlayer(ServerPlayerEntity player, SWPacket packet) {
-        try {
+    private void sendPacketToPlayer(ServerPlayerEntity player, SWPacket packet)
+    {
+        try
+        {
             ServerPlayNetworking.send(
                 player,
                 SharedWaypointsServer.sWIdentifier,
                 SWNetworkManager.packetToByteBuf(packet)
             );
-        } catch (IOException e) {
+        }
+        catch (IOException e)
+        {
             e.printStackTrace();
         }
     }
 
-    private void sendPacketToSender(PacketSender sender, SWPacket packet) {
-        try {
+    private void sendPacketToSender(PacketSender sender, SWPacket packet)
+    {
+        try
+        {
             sender.sendPacket(
                 SharedWaypointsServer.sWIdentifier,
                 SWNetworkManager.packetToByteBuf(packet)
             );
-        } catch (IOException e) {
+        }
+        catch (IOException e)
+        {
             e.printStackTrace();
         }
     }
 
     // will be submitted to Server Thread
-    public void handleAction(MinecraftServer server, UUID uuid, SWAction action) {
+    public void handleAction(MinecraftServer server, UUID uuid, SWAction action)
+    {
 
     }
 
-    public boolean handleIfSubscribed(MinecraftServer server, UUID uuid, DataInputStream dis) {
+    public boolean handleIfSubscribed(MinecraftServer server, UUID uuid, DataInputStream dis)
+    {
         ProtocolAdapter adapter = this.subscribedPlayers.get(uuid);
 
-        if (adapter != null) {
-            try {
+        if (adapter != null)
+        {
+            try
+            {
                 SWAction action = adapter.toAction(dis);
 
                 dis.close();
                 server.execute(() -> this.handleAction(server, uuid, action));
-            } catch (IOException e) { e.printStackTrace(); }
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+            }
 
             return true;
         }
@@ -114,13 +137,18 @@ public class SWNetworkManager {
         return false;
     }
 
-    public void subscribePlayer(MinecraftServer server, ServerPlayerEntity player, PacketSender responseSender, int protocolVersion) {
-        ProtocolAdapter adapter = switch (protocolVersion) {
-            case 1 -> V1ProtocolAdapter.INSTANCE;
-            default -> null;
-        };
+    public void subscribePlayer(
+        MinecraftServer server, ServerPlayerEntity player, PacketSender responseSender, int protocolVersion
+    )
+    {
+        ProtocolAdapter adapter = switch (protocolVersion)
+            {
+                case 1 -> V1ProtocolAdapter.INSTANCE;
+                default -> null;
+            };
 
-        if (adapter != null) {
+        if (adapter != null)
+        {
             UUID uuid = player.getUuid();
 
             this.subscribedPlayers.put(uuid, adapter);
@@ -139,7 +167,8 @@ public class SWNetworkManager {
             // packet has been sent yet. then the manager could discard the waypoint update if initialization has not
             // happened yet.
             server.execute(
-                () -> {
+                () ->
+                {
                     // lexically refer to MinecraftServer singleton instead of ServerPlayerEntity object
                     // because I don't know if ServerPlayerEntity will be valid when this is run.
 
@@ -151,18 +180,23 @@ public class SWNetworkManager {
                     // not need to worry about the issues above.
                     // this would obviously require significant synchronization of the waypoint state for it to
                     // be safe
-                    this.sendToPlayer(adapter, server.getPlayerManager().getPlayer(uuid), new SWWaypointInitializeAction());
+                    this.sendToPlayer(
+                        adapter, server.getPlayerManager().getPlayer(uuid), new SWWaypointInitializeAction());
                 }
             );
 
             // TLDR; currently it is feasible for the client to be told to remove or update a waypoint BEFORE
             // waypoints have been sent to the client. It is the client's responsibility to fail gracefully.
-        } else {
-            this.sendPacketToSender(responseSender, new SWUnsupported(SharedWaypointsServer.maxSupportedProtocolVersion));
+        }
+        else
+        {
+            this.sendPacketToSender(
+                responseSender, new SWUnsupported(SharedWaypointsServer.maxSupportedProtocolVersion));
         }
     }
 
-    public void unsubscribePlayer(UUID uuid) {
+    public void unsubscribePlayer(UUID uuid)
+    {
         this.subscribedPlayers.remove(uuid);
     }
 
