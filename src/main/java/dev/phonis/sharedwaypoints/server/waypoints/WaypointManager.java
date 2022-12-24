@@ -24,9 +24,9 @@ public class WaypointManager
     private static final Gson            GSON             = new GsonBuilder().setPrettyPrinting().create();
     public static final  String          waypointFile     = SharedWaypointsServer.configDirectory + "waypoints.json";
     public static final  String          backupDirectory  = SharedWaypointsServer.configDirectory + "backup/";
-    public static final  WaypointManager INSTANCE         = WaypointManager.load();
-    public static final  String          worldIdentifier  = "overworld";
-    public static final  String          netherIdentifier = "the_nether";
+    public static final  WaypointManager INSTANCE            = WaypointManager.load();
+    public static final  String          overworldIdentifier = "overworld";
+    public static final  String          netherIdentifier    = "the_nether";
     public static final  String          endIdentifier    = "the_end";
 
     private final Map<String, Waypoint> waypointMap = new HashMap<>();

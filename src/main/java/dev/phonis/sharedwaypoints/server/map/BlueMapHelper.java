@@ -1,4 +1,4 @@
-package dev.phonis.sharedwaypoints.server.bluemap;
+package dev.phonis.sharedwaypoints.server.map;
 
 import de.bluecolored.bluemap.api.markers.HtmlMarker;
 import de.bluecolored.bluemap.api.markers.Marker;

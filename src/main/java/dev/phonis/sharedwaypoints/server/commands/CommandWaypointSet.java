@@ -2,11 +2,13 @@ package dev.phonis.sharedwaypoints.server.commands;
 
 import com.mojang.brigadier.context.CommandContext;
 import de.bluecolored.bluemap.api.BlueMapAPI;
-import dev.phonis.sharedwaypoints.server.bluemap.BlueMapHelper;
+import dev.phonis.sharedwaypoints.server.SharedWaypointsServer;
 import dev.phonis.sharedwaypoints.server.commands.argument.StringCommandArgument;
 import dev.phonis.sharedwaypoints.server.commands.exception.CommandException;
 import dev.phonis.sharedwaypoints.server.commands.internal.OptionalSingleServerCommand;
 import dev.phonis.sharedwaypoints.server.commands.util.ContextUtil;
+import dev.phonis.sharedwaypoints.server.map.BlueMapHelper;
+import dev.phonis.sharedwaypoints.server.map.DynmapHelper;
 import dev.phonis.sharedwaypoints.server.networking.SWNetworkManager;
 import dev.phonis.sharedwaypoints.server.networking.protocol.action.SWWaypointUpdateAction;
 import dev.phonis.sharedwaypoints.server.waypoints.Waypoint;
@@ -45,6 +47,8 @@ class CommandWaypointSet extends OptionalSingleServerCommand<String>
         BlueMapAPI.getInstance().flatMap(api -> api.getMap(BlueMapHelper.getMapIDFromWorldID(waypoint.getWorld())))
             .ifPresent((map) -> map.getMarkerSets().get(BlueMapHelper.getMarkerSetIDFromWorldID(waypoint.getWorld()))
                 .put(waypoint.getName(), BlueMapHelper.getMarkerFromWaypoint(waypoint)));
+        SharedWaypointsServer.dynmapAPI.ifPresent(api -> DynmapHelper.createMarkerFromWaypoint(waypoint,
+            api.getMarkerAPI().getMarkerSet(DynmapHelper.markerSetID)));
         SWNetworkManager.INSTANCE.sendToSubscribed(source, new SWWaypointUpdateAction(waypoint));
     }
 

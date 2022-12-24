@@ -66,7 +66,7 @@ public class V1ProtocolAdapter implements ProtocolAdapter
 
     private V1SWDimension fromIdentifier(String identifier)
     {
-        if (identifier.equals(WaypointManager.worldIdentifier))
+        if (identifier.equals(WaypointManager.overworldIdentifier))
             return V1SWDimension.OVERWORLD;
 
         if (identifier.equals(WaypointManager.netherIdentifier))
