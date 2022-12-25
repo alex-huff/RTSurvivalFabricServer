@@ -38,16 +38,24 @@ class CommandWaypointSet extends OptionalSingleServerCommand<String>
     protected
     void onOptionalCommand(CommandContext<ServerCommandSource> source, String s)
     {
-        Waypoint waypoint = WaypointManager.INSTANCE.addWaypoint(source, s);
+        Waypoint oldWaypoint = WaypointManager.INSTANCE.getWaypoint(s);
+        Waypoint waypoint    = WaypointManager.INSTANCE.addWaypoint(source, s);
 
         ContextUtil.sendMessage(source,
             Formatting.WHITE + "Waypoint '" + Formatting.AQUA + waypoint.getName() + Formatting.WHITE + "' ➤ " +
             Formatting.GRAY + waypoint.getWorld() + " " + Formatting.GRAY + (int) waypoint.getX() + " " +
             (int) waypoint.getY() + " " + (int) waypoint.getZ());
+        if (oldWaypoint != null && !oldWaypoint.getWorld().equals(waypoint.getWorld()))
+        {
+            BlueMapAPI.getInstance()
+                .flatMap(api -> api.getMap(BlueMapHelper.getMapIDFromWorldID(oldWaypoint.getWorld()))).ifPresent(
+                    map -> map.getMarkerSets().get(BlueMapHelper.getMarkerSetIDFromWorldID(oldWaypoint.getWorld()))
+                        .remove(oldWaypoint.getName()));
+        }
         BlueMapAPI.getInstance().flatMap(api -> api.getMap(BlueMapHelper.getMapIDFromWorldID(waypoint.getWorld())))
             .ifPresent((map) -> map.getMarkerSets().get(BlueMapHelper.getMarkerSetIDFromWorldID(waypoint.getWorld()))
                 .put(waypoint.getName(), BlueMapHelper.getMarkerFromWaypoint(waypoint)));
-        SharedWaypointsServer.dynmapAPI.ifPresent(api -> DynmapHelper.createMarkerFromWaypoint(waypoint,
+        SharedWaypointsServer.getDynmapAPI().ifPresent(api -> DynmapHelper.createMarkerFromWaypoint(waypoint,
             api.getMarkerAPI().getMarkerSet(DynmapHelper.markerSetID)));
         SWNetworkManager.INSTANCE.sendToSubscribed(source, new SWWaypointUpdateAction(waypoint));
     }

@@ -9,29 +9,33 @@ import net.minecraft.server.command.ServerCommandSource;
 import java.util.LinkedList;
 import java.util.List;
 
-public abstract class NoArgServerCommand extends AbstractServerCommand
+public abstract
+class NoArgServerCommand extends AbstractServerCommand
 {
 
     protected final List<CommandArgument<?>> arguments = new LinkedList<>();
 
-    public NoArgServerCommand(String name)
+    public
+    NoArgServerCommand(String name)
     {
         super(name);
     }
 
     @Override
-    public List<CommandArgument<?>> getArguments()
+    public
+    List<CommandArgument<?>> getArguments()
     {
         return arguments;
     }
 
     @Override
-    public void onCommand(CommandContext<ServerCommandSource> source) throws CommandException, CommandSyntaxException
+    public
+    void onCommand(CommandContext<ServerCommandSource> source) throws CommandException, CommandSyntaxException
     {
         this.onOptionalCommand(source);
     }
 
-    protected abstract void onOptionalCommand(CommandContext<ServerCommandSource> source)
-        throws CommandException, CommandSyntaxException;
+    protected abstract
+    void onOptionalCommand(CommandContext<ServerCommandSource> source) throws CommandException, CommandSyntaxException;
 
 }

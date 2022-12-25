@@ -8,7 +8,8 @@ import net.minecraft.util.Formatting;
 import java.util.Collection;
 import java.util.List;
 
-public interface IServerCommand
+public
+interface IServerCommand
 {
 
     Collection<IServerCommand> getSubCommands();
@@ -21,22 +22,27 @@ public interface IServerCommand
 
     int execute(CommandContext<ServerCommandSource> source);
 
-    default String getUsage()
+    default
+    String getUsage()
     {
         return this.getUsage(0);
     }
 
-    private void generateHint(StringBuilder builder)
+    private
+    void generateHint(StringBuilder builder)
     {
         this.getArguments().forEach(commandArgument -> builder.append("<[").append(commandArgument.name).append("]> "));
     }
 
-    private String getUsage(int depth)
+    private
+    String getUsage(int depth)
     {
         StringBuilder message = new StringBuilder();
 
         if (depth > 0)
+        {
             message.append('\n').append("   ".repeat(depth));
+        }
 
         message.append(Formatting.RESET).append(Formatting.AQUA);
         message.append(this.getName()).append(' ').append(Formatting.GRAY);

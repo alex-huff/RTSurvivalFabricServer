@@ -68,16 +68,24 @@ class CommandWaypointUpdate extends OptionalPairServerCommand<String, PosArgumen
             throw new CommandException("Invalid waypoint to update.");
         }
 
-        Waypoint waypoint = WaypointManager.INSTANCE.updateWaypoint(s, position, world);
+        String oldWaypointWorld = WaypointManager.INSTANCE.getWaypoint(s).getWorld();
+        Waypoint waypoint    = WaypointManager.INSTANCE.updateWaypoint(s, position, world);
 
         ContextUtil.sendMessage(source,
             Formatting.WHITE + "Position of '" + Formatting.AQUA + waypoint.getName() + Formatting.WHITE + "' ➤ " +
             Formatting.AQUA + waypoint.getWorld() + Formatting.WHITE + " ➤ " + Formatting.GRAY + (int) waypoint.getX() +
             ", " + (int) waypoint.getY() + ", " + (int) waypoint.getZ());
+        if (!oldWaypointWorld.equals(waypoint.getWorld()))
+        {
+            BlueMapAPI.getInstance()
+                .flatMap(api -> api.getMap(BlueMapHelper.getMapIDFromWorldID(oldWaypointWorld))).ifPresent(
+                    (map) -> map.getMarkerSets().get(BlueMapHelper.getMarkerSetIDFromWorldID(oldWaypointWorld))
+                        .remove(waypoint.getName()));
+        }
         BlueMapAPI.getInstance().flatMap(api -> api.getMap(BlueMapHelper.getMapIDFromWorldID(waypoint.getWorld())))
             .ifPresent((map) -> map.getMarkerSets().get(BlueMapHelper.getMarkerSetIDFromWorldID(waypoint.getWorld()))
                 .put(waypoint.getName(), BlueMapHelper.getMarkerFromWaypoint(waypoint)));
-        SharedWaypointsServer.dynmapAPI.ifPresent(
+        SharedWaypointsServer.getDynmapAPI().ifPresent(
             api -> api.getMarkerAPI().getMarkerSet(DynmapHelper.markerSetID).findMarker(waypoint.getName())
                 .setLocation(DynmapHelper.getDynmapWorldIDFromSWWorldID(waypoint.getWorld()), waypoint.getX(),
                     waypoint.getY(), waypoint.getZ()));

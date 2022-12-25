@@ -1,7 +1,5 @@
 package dev.phonis.sharedwaypoints.server.networking;
 
-import static net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking.PlayChannelHandler;
-
 import dev.phonis.sharedwaypoints.server.networking.protocol.persistant.Packets;
 import dev.phonis.sharedwaypoints.server.networking.protocol.persistant.SWRegister;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
@@ -14,16 +12,18 @@ import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 
-public class SWPlayHandler implements PlayChannelHandler
+import static net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking.PlayChannelHandler;
+
+public
+class SWPlayHandler implements PlayChannelHandler
 {
 
     public static final SWPlayHandler INSTANCE = new SWPlayHandler();
 
     @Override
-    public void receive(
-        MinecraftServer server, ServerPlayerEntity player, ServerPlayNetworkHandler handler, PacketByteBuf buf,
-        PacketSender responseSender
-    )
+    public
+    void receive(MinecraftServer server, ServerPlayerEntity player, ServerPlayNetworkHandler handler, PacketByteBuf buf,
+                 PacketSender responseSender)
     {
         byte[] data = new byte[buf.readableBytes()];
 
@@ -49,8 +49,8 @@ public class SWPlayHandler implements PlayChannelHandler
                         SWRegister register = SWRegister.fromBytes(dis);
 
                         dis.close();
-                        SWNetworkManager.INSTANCE.subscribePlayer(
-                            server, player, responseSender, register.protocolVersion);
+                        SWNetworkManager.INSTANCE.subscribePlayer(server, player, responseSender,
+                            register.protocolVersion);
                     }
                 }
             }

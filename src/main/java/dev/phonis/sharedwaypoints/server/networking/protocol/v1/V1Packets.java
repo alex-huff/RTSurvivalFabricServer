@@ -1,9 +1,11 @@
 package dev.phonis.sharedwaypoints.server.networking.protocol.v1;
 
-public class V1Packets
+public
+class V1Packets
 {
 
-    public static class In
+    public static
+    class In
     {
 
         public static final byte SWWaypointInitializeID = 0x02;

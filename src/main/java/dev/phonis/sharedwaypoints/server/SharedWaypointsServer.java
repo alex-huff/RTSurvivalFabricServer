@@ -24,10 +24,16 @@ public
 class SharedWaypointsServer implements DedicatedServerModInitializer
 {
 
-    public static final Identifier                sWIdentifier                = new Identifier("sharedwaypoints:main");
-    public static final int                       maxSupportedProtocolVersion = 1;
-    public static final String                    configDirectory             = "config/sharedwaypoints/";
-    public static       Optional<DynmapCommonAPI> dynmapAPI                   = Optional.empty();
+    public static final Identifier      sWIdentifier                = new Identifier("sharedwaypoints:main");
+    public static final int             maxSupportedProtocolVersion = 1;
+    public static final String          configDirectory             = "config/sharedwaypoints/";
+    private static      DynmapCommonAPI dynmapAPI                   = null;
+
+    public static
+    Optional<DynmapCommonAPI> getDynmapAPI()
+    {
+        return Optional.ofNullable(SharedWaypointsServer.dynmapAPI);
+    }
 
     @Override
     public
@@ -58,8 +64,8 @@ class SharedWaypointsServer implements DedicatedServerModInitializer
     private
     void dynmapInitializeAndCreateWaypoints(DynmapCommonAPI api)
     {
-        SharedWaypointsServer.dynmapAPI = Optional.of(api);
-        MarkerAPI markerAPI = api.getMarkerAPI();
+        SharedWaypointsServer.dynmapAPI = api;
+        MarkerAPI markerAPI = SharedWaypointsServer.dynmapAPI.getMarkerAPI();
         org.dynmap.markers.MarkerSet waypoints = markerAPI.createMarkerSet(DynmapHelper.markerSetID,
             DynmapHelper.markerSetLabel, null, false);
         waypoints.setHideByDefault(true);

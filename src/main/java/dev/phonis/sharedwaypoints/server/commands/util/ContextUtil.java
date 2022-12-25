@@ -5,14 +5,19 @@ import net.minecraft.entity.Entity;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
 
-public class ContextUtil
+public
+class ContextUtil
 {
 
-    public static void sendMessage(CommandContext<ServerCommandSource> source, String message)
+    public static
+    void sendMessage(CommandContext<ServerCommandSource> source, String message)
     {
         Entity entity = source.getSource().getEntity();
 
-        if (entity == null) return;
+        if (entity == null)
+        {
+            return;
+        }
 
         entity.sendMessage(Text.of(message));
     }

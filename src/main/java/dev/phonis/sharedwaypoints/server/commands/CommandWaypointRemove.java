@@ -50,8 +50,9 @@ class CommandWaypointRemove extends OptionalSingleServerCommand<String>
         BlueMapAPI.getInstance().flatMap(api -> api.getMap(BlueMapHelper.getMapIDFromWorldID(waypoint.getWorld())))
             .ifPresent((map) -> map.getMarkerSets().get(BlueMapHelper.getMarkerSetIDFromWorldID(waypoint.getWorld()))
                 .remove(waypoint.getName()));
-        SharedWaypointsServer.dynmapAPI.ifPresent(
-            api -> api.getMarkerAPI().getMarkerSet(DynmapHelper.markerSetID).findMarker(waypoint.getName()).deleteMarker());
+        SharedWaypointsServer.getDynmapAPI().ifPresent(
+            api -> api.getMarkerAPI().getMarkerSet(DynmapHelper.markerSetID).findMarker(waypoint.getName())
+                .deleteMarker());
         SWNetworkManager.INSTANCE.sendToSubscribed(source, new SWWaypointRemoveAction(waypoint.getName()));
     }
 

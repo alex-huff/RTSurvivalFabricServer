@@ -12,53 +12,62 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-public abstract class AbstractServerCommand implements IServerCommand
+public abstract
+class AbstractServerCommand implements IServerCommand
 {
 
     private final String               name;
     private final List<String>         aliases     = new LinkedList<>();
     private final List<IServerCommand> subCommands = new LinkedList<>();
 
-    public AbstractServerCommand(String name)
+    public
+    AbstractServerCommand(String name)
     {
         this.name = name;
     }
 
-    protected void addAlias(String alias)
+    protected
+    void addAlias(String alias)
     {
         this.aliases.add(alias);
     }
 
-    protected void addSubCommand(IServerCommand subCommand)
+    protected
+    void addSubCommand(IServerCommand subCommand)
     {
         this.subCommands.add(subCommand);
     }
 
     @Override
-    public Collection<String> getAliases()
+    public
+    Collection<String> getAliases()
     {
         return this.aliases;
     }
 
     @Override
-    public Collection<IServerCommand> getSubCommands()
+    public
+    Collection<IServerCommand> getSubCommands()
     {
         return this.subCommands;
     }
 
     @Override
-    public String getName()
+    public
+    String getName()
     {
         return this.name;
     }
 
     @Override
-    public int execute(CommandContext<ServerCommandSource> source)
+    public
+    int execute(CommandContext<ServerCommandSource> source)
     {
         return this.execute(source, this::onCommand);
     }
 
-    protected int execute(CommandContext<ServerCommandSource> source, CommandExecutor<ServerCommandSource> executor)
+    protected
+    int execute(CommandContext<ServerCommandSource> source, CommandExecutor<ServerCommandSource> executor)
     {
         try
         {
@@ -69,13 +78,15 @@ public abstract class AbstractServerCommand implements IServerCommand
             Entity entity = source.getSource().getEntity();
 
             if (entity != null)
+            {
                 ContextUtil.sendMessage(source, e.getMessage());
+            }
         }
 
         return Command.SINGLE_SUCCESS;
     }
 
-    public abstract void onCommand(CommandContext<ServerCommandSource> source)
-        throws CommandException, CommandSyntaxException;
+    public abstract
+    void onCommand(CommandContext<ServerCommandSource> source) throws CommandException, CommandSyntaxException;
 
 }

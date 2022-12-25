@@ -6,12 +6,14 @@ import dev.phonis.sharedwaypoints.server.commands.argument.CommandArgument;
 import dev.phonis.sharedwaypoints.server.commands.exception.CommandException;
 import net.minecraft.server.command.ServerCommandSource;
 
-public abstract class OptionalSingleServerCommand<A> extends NoArgServerCommand
+public abstract
+class OptionalSingleServerCommand<A> extends NoArgServerCommand
 {
 
     protected final CommandArgument<A> a;
 
-    public OptionalSingleServerCommand(String name, CommandArgument<A> a)
+    public
+    OptionalSingleServerCommand(String name, CommandArgument<A> a)
     {
         super(name);
 
@@ -21,15 +23,14 @@ public abstract class OptionalSingleServerCommand<A> extends NoArgServerCommand
         this.arguments.add(this.a);
     }
 
-    private void passArgs(CommandContext<ServerCommandSource> source) throws CommandException, CommandSyntaxException
+    private
+    void passArgs(CommandContext<ServerCommandSource> source) throws CommandException, CommandSyntaxException
     {
-        this.onOptionalCommand(
-            source,
-            (A) source.getArgument(this.a.name, Object.class)
-        );
+        this.onOptionalCommand(source, (A) source.getArgument(this.a.name, Object.class));
     }
 
-    protected abstract void onOptionalCommand(CommandContext<ServerCommandSource> source, A a)
+    protected abstract
+    void onOptionalCommand(CommandContext<ServerCommandSource> source, A a)
         throws CommandException, CommandSyntaxException;
 
 }

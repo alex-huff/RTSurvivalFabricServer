@@ -15,25 +15,27 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-public class SWCommandManager
+public
+class SWCommandManager
 {
 
     private static final List<IServerCommand> commands = new ArrayList<>();
 
-    public static void addCommand(IServerCommand command)
+    public static
+    void addCommand(IServerCommand command)
     {
         SWCommandManager.commands.add(command);
     }
 
-    public static void register()
+    public static
+    void register()
     {
         CommandRegistrationCallback.EVENT.register(SWCommandManager::registerCommands);
     }
 
-    public static void registerCommands(
-        CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess registryAccess,
-        CommandManager.RegistrationEnvironment env
-    )
+    public static
+    void registerCommands(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess registryAccess,
+                          CommandManager.RegistrationEnvironment env)
     {
         if (env.dedicated)
         {
@@ -45,10 +47,10 @@ public class SWCommandManager
         }
     }
 
-    private static List<LiteralArgumentBuilder<ServerCommandSource>> buildCommand(IServerCommand command)
+    private static
+    List<LiteralArgumentBuilder<ServerCommandSource>> buildCommand(IServerCommand command)
     {
-        LiteralArgumentBuilder<ServerCommandSource> rootCommand = LiteralArgumentBuilder.literal(
-            command.getName());
+        LiteralArgumentBuilder<ServerCommandSource> rootCommand = LiteralArgumentBuilder.literal(command.getName());
         List<LiteralArgumentBuilder<ServerCommandSource>> redirects = new LinkedList<>();
 
         // recurse down the tree and link all nodes at next depth including aliases which have already been redirected
@@ -82,7 +84,9 @@ public class SWCommandManager
         }
 
         if (previous != null)
+        {
             rootCommand.then(previous);
+        }
 
         redirects.add(rootCommand);
 
