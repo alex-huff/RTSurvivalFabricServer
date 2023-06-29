@@ -46,7 +46,7 @@ class CommandWaypointUpdate extends OptionalPairServerCommand<String, PosArgumen
         throws CommandException, CommandSyntaxException
     {
         this.onOptionalCommand(source, s, posArgument.toAbsolutePos(source.getSource()),
-            source.getSource().getPlayer().getWorld().toServerWorld());
+            source.getSource().getPlayer().getServerWorld());
     }
 
     @Override
@@ -56,7 +56,7 @@ class CommandWaypointUpdate extends OptionalPairServerCommand<String, PosArgumen
     {
         ServerPlayerEntity player = source.getSource().getPlayer();
 
-        this.onOptionalCommand(source, s, player.getPos(), player.getWorld().toServerWorld());
+        this.onOptionalCommand(source, s, player.getPos(), player.getServerWorld());
     }
 
     private

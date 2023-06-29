@@ -45,8 +45,7 @@ class BlueMapHelper
     Marker getMarkerFromWaypoint(Waypoint waypoint)
     {
         return HtmlMarker.builder().html(BlueMapHelper.markerHTML.replace("marker-label", waypoint.getName()))
-            .position((int) Math.round(waypoint.getX()), (int) Math.round(waypoint.getY()),
-                (int) Math.round(waypoint.getZ())).label(waypoint.getName()).build();
+            .position(waypoint.getX(), waypoint.getY(), waypoint.getZ()).label(waypoint.getName()).build();
     }
 
 }
