@@ -1,33 +1,32 @@
 package dev.phonis.sharedwaypoints.server.networking;
 
+import dev.phonis.sharedwaypoints.server.networking.payload.SWPayload;
 import dev.phonis.sharedwaypoints.server.networking.protocol.persistant.Packets;
 import dev.phonis.sharedwaypoints.server.networking.protocol.persistant.SWRegister;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
-import net.minecraft.network.PacketByteBuf;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 
-import static net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking.PlayChannelHandler;
+import static net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking.PlayPayloadHandler;
 
 public
-class SWPlayHandler implements PlayChannelHandler
+class SWPlayHandler implements PlayPayloadHandler<SWPayload>
 {
 
     public static final SWPlayHandler INSTANCE = new SWPlayHandler();
 
     @Override
     public
-    void receive(MinecraftServer server, ServerPlayerEntity player, ServerPlayNetworkHandler handler, PacketByteBuf buf,
-                 PacketSender responseSender)
+    void receive(SWPayload swPayload, ServerPlayNetworking.Context context)
     {
-        byte[] data = new byte[buf.readableBytes()];
-
-        buf.getBytes(0, data);
+        ServerPlayerEntity player         = context.player();
+        MinecraftServer    server         = player.getServer();
+        PacketSender       responseSender = context.responseSender();
 
         // can receive for the same player be called from multiple netty threads?
         // if so, theoretically packets could be lost if registering has not been completed by
@@ -38,7 +37,7 @@ class SWPlayHandler implements PlayChannelHandler
         {
             try
             {
-                DataInputStream dis = new DataInputStream(new ByteArrayInputStream(data));
+                DataInputStream dis = new DataInputStream(new ByteArrayInputStream(swPayload.bytes()));
 
                 if (!SWNetworkManager.INSTANCE.handleIfSubscribed(server, player.getUuid(), dis))
                 {
@@ -49,8 +48,7 @@ class SWPlayHandler implements PlayChannelHandler
                         SWRegister register = SWRegister.fromBytes(dis);
 
                         dis.close();
-                        SWNetworkManager.INSTANCE.subscribePlayer(server, player, responseSender,
-                            register.protocolVersion);
+                        SWNetworkManager.INSTANCE.subscribePlayer(server, player, responseSender, register.protocolVersion);
                     }
                 }
             }
@@ -60,5 +58,4 @@ class SWPlayHandler implements PlayChannelHandler
             }
         }
     }
-
 }

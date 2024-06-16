@@ -8,12 +8,13 @@ import dev.phonis.sharedwaypoints.server.map.BlueMapHelper;
 import dev.phonis.sharedwaypoints.server.map.DynmapHelper;
 import dev.phonis.sharedwaypoints.server.networking.SWNetworkManager;
 import dev.phonis.sharedwaypoints.server.networking.SWPlayHandler;
+import dev.phonis.sharedwaypoints.server.networking.payload.SWPayload;
 import dev.phonis.sharedwaypoints.server.waypoints.WaypointManager;
 import net.fabricmc.api.DedicatedServerModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.minecraft.util.Identifier;
 import org.dynmap.DynmapCommonAPI;
 import org.dynmap.DynmapCommonAPIListener;
 import org.dynmap.markers.MarkerAPI;
@@ -24,7 +25,6 @@ public
 class SharedWaypointsServer implements DedicatedServerModInitializer
 {
 
-    public static final Identifier      sWIdentifier                = new Identifier("sharedwaypoints:main");
     public static final int             maxSupportedProtocolVersion = 1;
     public static final String          configDirectory             = "config/sharedwaypoints/";
     private static      DynmapCommonAPI dynmapAPI                   = null;
@@ -41,11 +41,11 @@ class SharedWaypointsServer implements DedicatedServerModInitializer
     {
         SWCommandManager.addCommand(new CommandWaypoint());
         SWCommandManager.register();
-        ServerPlayNetworking.registerGlobalReceiver(sWIdentifier, SWPlayHandler.INSTANCE);
-        ServerPlayConnectionEvents.DISCONNECT.register(
-            (handler, server) -> SWNetworkManager.INSTANCE.unsubscribePlayer(handler.player.getUuid()));
-        ServerLifecycleEvents.SERVER_STARTED.register(
-            (server) -> BlueMapAPI.onEnable((api) -> server.execute(() -> this.blueMapCreateWaypoints(api))));
+        PayloadTypeRegistry.playC2S().register(SWPayload.id, SWPayload.codec);
+        PayloadTypeRegistry.playS2C().register(SWPayload.id, SWPayload.codec);
+        ServerPlayNetworking.registerGlobalReceiver(SWPayload.id, SWPlayHandler.INSTANCE);
+        ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> SWNetworkManager.INSTANCE.unsubscribePlayer(handler.player.getUuid()));
+        ServerLifecycleEvents.SERVER_STARTED.register((server) -> BlueMapAPI.onEnable((api) -> server.execute(() -> this.blueMapCreateWaypoints(api))));
         ServerLifecycleEvents.SERVER_STARTED.register(
             // Dynmap might always call apiEnabled on the main thread, in
             // which case I don't actually need to user MinecraftServer::execute to run the task later on the main
@@ -66,12 +66,11 @@ class SharedWaypointsServer implements DedicatedServerModInitializer
     {
         SharedWaypointsServer.dynmapAPI = api;
         MarkerAPI markerAPI = SharedWaypointsServer.dynmapAPI.getMarkerAPI();
-        org.dynmap.markers.MarkerSet waypoints = markerAPI.createMarkerSet(DynmapHelper.markerSetID,
-            DynmapHelper.markerSetLabel, null, false);
+        org.dynmap.markers.MarkerSet waypoints
+            = markerAPI.createMarkerSet(DynmapHelper.markerSetID, DynmapHelper.markerSetLabel, null, false);
         waypoints.setHideByDefault(true);
         waypoints.setDefaultMarkerIcon(markerAPI.getMarkerIcon("blueflag"));
-        WaypointManager.INSTANCE.forEachWaypoint(
-            (waypoint) -> DynmapHelper.createMarkerFromWaypoint(waypoint, waypoints));
+        WaypointManager.INSTANCE.forEachWaypoint((waypoint) -> DynmapHelper.createMarkerFromWaypoint(waypoint, waypoints));
     }
 
     private

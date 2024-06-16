@@ -2,15 +2,14 @@ package dev.phonis.sharedwaypoints.server.networking;
 
 import com.mojang.brigadier.context.CommandContext;
 import dev.phonis.sharedwaypoints.server.SharedWaypointsServer;
+import dev.phonis.sharedwaypoints.server.networking.payload.SWPayload;
 import dev.phonis.sharedwaypoints.server.networking.protocol.action.SWAction;
 import dev.phonis.sharedwaypoints.server.networking.protocol.action.SWWaypointInitializeAction;
 import dev.phonis.sharedwaypoints.server.networking.protocol.persistant.SWPacket;
 import dev.phonis.sharedwaypoints.server.networking.protocol.persistant.SWUnsupported;
 import dev.phonis.sharedwaypoints.server.networking.protocol.v1.V1ProtocolAdapter;
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.command.ServerCommandSource;
@@ -34,18 +33,15 @@ class SWNetworkManager
     private final Map<UUID, ProtocolAdapter> subscribedPlayers = new ConcurrentHashMap<>();
 
     private static
-    PacketByteBuf packetToByteBuf(SWPacket packet) throws IOException
+    byte[] packetToBytes(SWPacket packet) throws IOException
     {
-        ByteArrayOutputStream baos         = new ByteArrayOutputStream();
-        DataOutputStream      das          = new DataOutputStream(baos);
-        PacketByteBuf         packetBuffer = PacketByteBufs.create();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        DataOutputStream      das  = new DataOutputStream(baos);
 
         das.writeByte(packet.getID());
         packet.toBytes(das);
         das.close();
-        packetBuffer.writeBytes(baos.toByteArray());
-
-        return packetBuffer;
+        return baos.toByteArray();
     }
 
     public
@@ -90,8 +86,7 @@ class SWNetworkManager
     {
         try
         {
-            ServerPlayNetworking.send(player, SharedWaypointsServer.sWIdentifier,
-                SWNetworkManager.packetToByteBuf(packet));
+            ServerPlayNetworking.send(player, new SWPayload(SWNetworkManager.packetToBytes(packet)));
         }
         catch (IOException e)
         {
@@ -104,7 +99,7 @@ class SWNetworkManager
     {
         try
         {
-            sender.sendPacket(SharedWaypointsServer.sWIdentifier, SWNetworkManager.packetToByteBuf(packet));
+            sender.sendPacket(new SWPayload(SWNetworkManager.packetToBytes(packet)));
         }
         catch (IOException e)
         {
@@ -194,8 +189,7 @@ class SWNetworkManager
         }
         else
         {
-            this.sendPacketToSender(responseSender,
-                new SWUnsupported(SharedWaypointsServer.maxSupportedProtocolVersion));
+            this.sendPacketToSender(responseSender, new SWUnsupported(SharedWaypointsServer.maxSupportedProtocolVersion));
         }
     }
 
