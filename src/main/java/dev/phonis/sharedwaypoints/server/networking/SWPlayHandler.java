@@ -14,19 +14,17 @@ import java.io.IOException;
 
 import static net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking.PlayPayloadHandler;
 
-public
-class SWPlayHandler implements PlayPayloadHandler<SWPayload>
+public class SWPlayHandler implements PlayPayloadHandler<SWPayload>
 {
 
     public static final SWPlayHandler INSTANCE = new SWPlayHandler();
 
     @Override
-    public
-    void receive(SWPayload swPayload, ServerPlayNetworking.Context context)
+    public void receive(SWPayload swPayload, ServerPlayNetworking.Context context)
     {
-        ServerPlayerEntity player         = context.player();
-        MinecraftServer    server         = player.getServer();
-        PacketSender       responseSender = context.responseSender();
+        ServerPlayerEntity player = context.player();
+        MinecraftServer server = player.getServer();
+        PacketSender responseSender = context.responseSender();
 
         // can receive for the same player be called from multiple netty threads?
         // if so, theoretically packets could be lost if registering has not been completed by
@@ -58,4 +56,5 @@ class SWPlayHandler implements PlayPayloadHandler<SWPayload>
             }
         }
     }
+
 }

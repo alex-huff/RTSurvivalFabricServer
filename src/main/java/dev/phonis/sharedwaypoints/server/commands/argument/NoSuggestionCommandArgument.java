@@ -9,20 +9,17 @@ import net.minecraft.server.command.ServerCommandSource;
 
 import java.util.concurrent.CompletableFuture;
 
-public
-class NoSuggestionCommandArgument<T> extends CommandArgument<T>
+public class NoSuggestionCommandArgument<T> extends CommandArgument<T>
 {
 
-    public
-    NoSuggestionCommandArgument(String name, ArgumentType<T> type)
+    public NoSuggestionCommandArgument(String name, ArgumentType<T> type)
     {
         super(name, type);
     }
 
     @Override
-    public
-    CompletableFuture<Suggestions> getSuggestions(CommandContext<ServerCommandSource> context,
-                                                  SuggestionsBuilder builder) throws CommandSyntaxException
+    public CompletableFuture<Suggestions> getSuggestions(CommandContext<ServerCommandSource> context,
+                                                         SuggestionsBuilder builder) throws CommandSyntaxException
     {
         return Suggestions.empty();
     }

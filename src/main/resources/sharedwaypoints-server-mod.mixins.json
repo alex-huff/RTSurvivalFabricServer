@@ -2,11 +2,9 @@
   "required": true,
   "package": "dev.phonis.sharedwaypoints.server.mixin",
   "compatibilityLevel": "JAVA_21",
-  "mixins":
-  [
+  "mixins": [
   ],
-  "injectors":
-  {
+  "injectors": {
     "defaultRequire": 1
   }
 }

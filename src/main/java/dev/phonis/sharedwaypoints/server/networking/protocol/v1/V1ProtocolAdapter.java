@@ -13,22 +13,19 @@ import java.io.DataInputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-public
-class V1ProtocolAdapter implements ProtocolAdapter
+public class V1ProtocolAdapter implements ProtocolAdapter
 {
 
     public static final V1ProtocolAdapter INSTANCE = new V1ProtocolAdapter();
 
     @Override
-    public
-    SWAction toAction(DataInputStream dis)
+    public SWAction toAction(DataInputStream dis)
     {
         return null;
     }
 
     @Override
-    public
-    SWPacket fromWaypointInitialize(SWWaypointInitializeAction action)
+    public SWPacket fromWaypointInitialize(SWWaypointInitializeAction action)
     {
         List<V1SWWaypoint> waypoints = new ArrayList<>();
 
@@ -38,34 +35,28 @@ class V1ProtocolAdapter implements ProtocolAdapter
     }
 
     @Override
-    public
-    SWPacket fromWaypointUpdate(SWWaypointUpdateAction action)
+    public SWPacket fromWaypointUpdate(SWWaypointUpdateAction action)
     {
         return new V1SWWaypointUpdate(this.fromWaypoint(action.waypoint));
     }
 
     @Override
-    public
-    SWPacket fromWaypointRemove(SWWaypointRemoveAction action)
+    public SWPacket fromWaypointRemove(SWWaypointRemoveAction action)
     {
         return new V1SWWaypointRemove(action.name);
     }
 
-    private
-    V1SWWaypoint fromWaypoint(Waypoint waypoint)
+    private V1SWWaypoint fromWaypoint(Waypoint waypoint)
     {
         return new V1SWWaypoint(waypoint.getName(), this.locationFromWaypoint(waypoint));
     }
 
-    private
-    V1SWLocation locationFromWaypoint(Waypoint waypoint)
+    private V1SWLocation locationFromWaypoint(Waypoint waypoint)
     {
-        return new V1SWLocation(this.fromIdentifier(waypoint.getWorld()), waypoint.getX(), waypoint.getY(),
-            waypoint.getZ());
+        return new V1SWLocation(this.fromIdentifier(waypoint.getWorld()), waypoint.getX(), waypoint.getY(), waypoint.getZ());
     }
 
-    private
-    V1SWDimension fromIdentifier(String identifier)
+    private V1SWDimension fromIdentifier(String identifier)
     {
         if (identifier.equals(WaypointManager.overworldIdentifier))
         {

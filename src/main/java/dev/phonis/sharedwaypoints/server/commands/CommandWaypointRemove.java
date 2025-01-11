@@ -16,27 +16,23 @@ import dev.phonis.sharedwaypoints.server.waypoints.WaypointManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.util.Formatting;
 
-public
-class CommandWaypointRemove extends OptionalSingleServerCommand<String>
+public class CommandWaypointRemove extends OptionalSingleServerCommand<String>
 {
 
-    public
-    CommandWaypointRemove()
+    public CommandWaypointRemove()
     {
         super("remove", new WaypointCommandArgument("waypoint"));
         this.addAlias("r");
     }
 
     @Override
-    protected
-    void onOptionalCommand(CommandContext<ServerCommandSource> source) throws CommandException
+    protected void onOptionalCommand(CommandContext<ServerCommandSource> source) throws CommandException
     {
         throw new CommandException("You must provide a waypoint name.");
     }
 
     @Override
-    protected
-    void onOptionalCommand(CommandContext<ServerCommandSource> source, String s) throws CommandException
+    protected void onOptionalCommand(CommandContext<ServerCommandSource> source, String s) throws CommandException
     {
         Waypoint waypoint = WaypointManager.INSTANCE.removeWaypoint(s);
 
@@ -50,8 +46,8 @@ class CommandWaypointRemove extends OptionalSingleServerCommand<String>
         BlueMapAPI.getInstance().flatMap(api -> api.getMap(BlueMapHelper.getMapIDFromWorldID(waypoint.getWorld())))
             .ifPresent((map) -> map.getMarkerSets().get(BlueMapHelper.getMarkerSetIDFromWorldID(waypoint.getWorld()))
                 .remove(waypoint.getName()));
-        SharedWaypointsServer.getDynmapAPI().ifPresent(
-            api -> api.getMarkerAPI().getMarkerSet(DynmapHelper.markerSetID).findMarker(waypoint.getName())
+        SharedWaypointsServer.getDynmapAPI()
+            .ifPresent(api -> api.getMarkerAPI().getMarkerSet(DynmapHelper.markerSetID).findMarker(waypoint.getName())
                 .deleteMarker());
         SWNetworkManager.INSTANCE.sendToSubscribed(source, new SWWaypointRemoveAction(waypoint.getName()));
     }

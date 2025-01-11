@@ -5,8 +5,7 @@ import de.bluecolored.bluemap.api.markers.Marker;
 import dev.phonis.sharedwaypoints.server.waypoints.Waypoint;
 import dev.phonis.sharedwaypoints.server.waypoints.WaypointManager;
 
-public
-class BlueMapHelper
+public class BlueMapHelper
 {
 
     private static final String markerHTML = """
@@ -15,8 +14,7 @@ class BlueMapHelper
                                              </div>
                                              """;
 
-    public static
-    String getMapIDFromWorldID(String worldID)
+    public static String getMapIDFromWorldID(String worldID)
     {
         switch (worldID)
         {
@@ -35,14 +33,12 @@ class BlueMapHelper
         }
     }
 
-    public static
-    String getMarkerSetIDFromWorldID(String dimension)
+    public static String getMarkerSetIDFromWorldID(String dimension)
     {
         return dimension + "-waypoints";
     }
 
-    public static
-    Marker getMarkerFromWaypoint(Waypoint waypoint)
+    public static Marker getMarkerFromWaypoint(Waypoint waypoint)
     {
         return HtmlMarker.builder().html(BlueMapHelper.markerHTML.replace("marker-label", waypoint.getName()))
             .position(waypoint.getX(), waypoint.getY(), waypoint.getZ()).label(waypoint.getName()).build();

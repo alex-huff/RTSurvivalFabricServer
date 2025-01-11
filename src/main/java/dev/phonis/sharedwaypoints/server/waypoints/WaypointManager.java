@@ -18,31 +18,28 @@ import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-public
-class WaypointManager
+public class WaypointManager
 {
 
-    private static final Gson            GSON                = new GsonBuilder().setPrettyPrinting().create();
-    public static final  String          waypointFile        = SharedWaypointsServer.configDirectory + "waypoints.json";
-    public static final  String          backupDirectory     = SharedWaypointsServer.configDirectory + "backup/";
-    public static final  WaypointManager INSTANCE            = WaypointManager.load();
-    public static final  String          overworldIdentifier = "overworld";
-    public static final  String          netherIdentifier    = "the_nether";
-    public static final  String          endIdentifier       = "the_end";
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    public static final String waypointFile = SharedWaypointsServer.configDirectory + "waypoints.json";
+    public static final String backupDirectory = SharedWaypointsServer.configDirectory + "backup/";
+    public static final WaypointManager INSTANCE = WaypointManager.load();
+    public static final String overworldIdentifier = "overworld";
+    public static final String netherIdentifier = "the_nether";
+    public static final String endIdentifier = "the_end";
 
     private final Map<String, Waypoint> waypointMap = new HashMap<>();
 
-    public
-    void forEachWaypoint(Consumer<Waypoint> consumer)
+    public void forEachWaypoint(Consumer<Waypoint> consumer)
     {
         this.waypointMap.values().forEach(consumer);
     }
 
-    public
-    void forEachWaypoint(BiConsumer<Waypoint, Boolean> consumer)
+    public void forEachWaypoint(BiConsumer<Waypoint, Boolean> consumer)
     {
-        Collection<Waypoint> values   = this.waypointMap.values();
-        Iterator<Waypoint>   iterator = values.iterator();
+        Collection<Waypoint> values = this.waypointMap.values();
+        Iterator<Waypoint> iterator = values.iterator();
 
         while (iterator.hasNext())
         {
@@ -50,14 +47,12 @@ class WaypointManager
         }
     }
 
-    public
-    Waypoint getWaypoint(String name)
+    public Waypoint getWaypoint(String name)
     {
         return this.waypointMap.get(name);
     }
 
-    public
-    Waypoint removeWaypoint(String name)
+    public Waypoint removeWaypoint(String name)
     {
         Waypoint waypoint = this.waypointMap.remove(name);
 
@@ -66,12 +61,11 @@ class WaypointManager
         return waypoint;
     }
 
-    public
-    Waypoint addWaypoint(CommandContext<ServerCommandSource> source, String name)
+    public Waypoint addWaypoint(CommandContext<ServerCommandSource> source, String name)
     {
         Vec3d position = source.getSource().getPosition();
-        Waypoint waypoint = new Waypoint(name, source.getSource().getWorld().getRegistryKey().getValue().getPath(),
-            position.getX(), position.getY(), position.getZ());
+        Waypoint waypoint = new Waypoint(name, source.getSource().getWorld().getRegistryKey().getValue()
+            .getPath(), position.getX(), position.getY(), position.getZ());
 
         this.waypointMap.put(name, waypoint);
         this.trySave();
@@ -79,8 +73,7 @@ class WaypointManager
         return waypoint;
     }
 
-    public
-    Waypoint updateWaypoint(String s, Vec3d position, ServerWorld world)
+    public Waypoint updateWaypoint(String s, Vec3d position, ServerWorld world)
     {
         Waypoint toUpdate = this.waypointMap.get(s);
 
@@ -90,20 +83,17 @@ class WaypointManager
         return toUpdate;
     }
 
-    public
-    boolean hasWaypoint(String name)
+    public boolean hasWaypoint(String name)
     {
         return this.waypointMap.containsKey(name);
     }
 
-    public
-    int numWaypoints()
+    public int numWaypoints()
     {
         return this.waypointMap.size();
     }
 
-    private static
-    WaypointManager load()
+    private static WaypointManager load()
     {
         if (Files.exists(Path.of(WaypointManager.waypointFile)))
         {
@@ -122,8 +112,7 @@ class WaypointManager
         return new WaypointManager();
     }
 
-    public static
-    void backup() throws IOException
+    public static void backup() throws IOException
     {
         Path path = Path.of(WaypointManager.waypointFile);
         Path backupPath = Path.of(
@@ -139,10 +128,9 @@ class WaypointManager
         Files.copy(path, backupPath, StandardCopyOption.REPLACE_EXISTING);
     }
 
-    public
-    void saveToFile() throws IOException
+    public void saveToFile() throws IOException
     {
-        Path path   = Path.of(WaypointManager.waypointFile);
+        Path path = Path.of(WaypointManager.waypointFile);
         Path parent = path.getParent();
 
         if (!Files.exists(parent))
@@ -157,8 +145,7 @@ class WaypointManager
         Files.move(tempPath, path, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
     }
 
-    public
-    void trySave()
+    public void trySave()
     {
         try
         {

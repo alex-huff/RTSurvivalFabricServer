@@ -5,8 +5,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import dev.phonis.sharedwaypoints.server.commands.exception.CommandException;
 
 @FunctionalInterface
-public
-interface CommandExecutor<S>
+public interface CommandExecutor<S>
 {
 
     void accept(CommandContext<S> commandContext) throws CommandException, CommandSyntaxException;

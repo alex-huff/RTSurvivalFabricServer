@@ -24,19 +24,17 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-public
-class SWNetworkManager
+public class SWNetworkManager
 {
 
     public static final SWNetworkManager INSTANCE = new SWNetworkManager();
 
     private final Map<UUID, ProtocolAdapter> subscribedPlayers = new ConcurrentHashMap<>();
 
-    private static
-    byte[] packetToBytes(SWPacket packet) throws IOException
+    private static byte[] packetToBytes(SWPacket packet) throws IOException
     {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        DataOutputStream      das  = new DataOutputStream(baos);
+        DataOutputStream das = new DataOutputStream(baos);
 
         das.writeByte(packet.getID());
         packet.toBytes(das);
@@ -44,15 +42,13 @@ class SWNetworkManager
         return baos.toByteArray();
     }
 
-    public
-    void sendToSubscribed(CommandContext<ServerCommandSource> source, SWAction action)
+    public void sendToSubscribed(CommandContext<ServerCommandSource> source, SWAction action)
     {
         this.sendToSubscribed(source.getSource().getServer().getPlayerManager(), action);
     }
 
     // should be called from Server Thread
-    public
-    void sendToSubscribed(PlayerManager playerManager, SWAction action)
+    public void sendToSubscribed(PlayerManager playerManager, SWAction action)
     {
         // although iteration over the hashmap does not guarantee that no modifications are made
         // during the iteration, the iterator should display that state of the map at the time
@@ -64,14 +60,12 @@ class SWNetworkManager
     }
 
     // should be called from Server Thread
-    public
-    void sendIfSubscribed(ServerPlayerEntity player, SWAction action)
+    public void sendIfSubscribed(ServerPlayerEntity player, SWAction action)
     {
         this.sendToPlayer(this.subscribedPlayers.get(player.getUuid()), player, action);
     }
 
-    private
-    void sendToPlayer(ProtocolAdapter adapter, @Nullable ServerPlayerEntity player, SWAction action)
+    private void sendToPlayer(ProtocolAdapter adapter, @Nullable ServerPlayerEntity player, SWAction action)
     {
         if (player == null || adapter == null)
         {
@@ -81,8 +75,7 @@ class SWNetworkManager
         this.sendPacketToPlayer(player, adapter.fromAction(action));
     }
 
-    private
-    void sendPacketToPlayer(ServerPlayerEntity player, SWPacket packet)
+    private void sendPacketToPlayer(ServerPlayerEntity player, SWPacket packet)
     {
         try
         {
@@ -94,8 +87,7 @@ class SWNetworkManager
         }
     }
 
-    private
-    void sendPacketToSender(PacketSender sender, SWPacket packet)
+    private void sendPacketToSender(PacketSender sender, SWPacket packet)
     {
         try
         {
@@ -108,14 +100,12 @@ class SWNetworkManager
     }
 
     // will be submitted to Server Thread
-    public
-    void handleAction(MinecraftServer server, UUID uuid, SWAction action)
+    public void handleAction(MinecraftServer server, UUID uuid, SWAction action)
     {
 
     }
 
-    public
-    boolean handleIfSubscribed(MinecraftServer server, UUID uuid, DataInputStream dis)
+    public boolean handleIfSubscribed(MinecraftServer server, UUID uuid, DataInputStream dis)
     {
         ProtocolAdapter adapter = this.subscribedPlayers.get(uuid);
 
@@ -139,15 +129,14 @@ class SWNetworkManager
         return false;
     }
 
-    public
-    void subscribePlayer(MinecraftServer server, ServerPlayerEntity player, PacketSender responseSender,
-                         int protocolVersion)
+    public void subscribePlayer(MinecraftServer server, ServerPlayerEntity player, PacketSender responseSender,
+                                int protocolVersion)
     {
         ProtocolAdapter adapter = switch (protocolVersion)
-            {
-                case 1 -> V1ProtocolAdapter.INSTANCE;
-                default -> null;
-            };
+        {
+            case 1 -> V1ProtocolAdapter.INSTANCE;
+            default -> null;
+        };
 
         if (adapter != null)
         {
@@ -193,8 +182,7 @@ class SWNetworkManager
         }
     }
 
-    public
-    void unsubscribePlayer(UUID uuid)
+    public void unsubscribePlayer(UUID uuid)
     {
         this.subscribedPlayers.remove(uuid);
     }

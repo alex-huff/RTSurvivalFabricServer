@@ -21,23 +21,20 @@ import org.dynmap.markers.MarkerAPI;
 
 import java.util.Optional;
 
-public
-class SharedWaypointsServer implements DedicatedServerModInitializer
+public class SharedWaypointsServer implements DedicatedServerModInitializer
 {
 
-    public static final int             maxSupportedProtocolVersion = 1;
-    public static final String          configDirectory             = "config/sharedwaypoints/";
-    private static      DynmapCommonAPI dynmapAPI                   = null;
+    public static final int maxSupportedProtocolVersion = 1;
+    public static final String configDirectory = "config/sharedwaypoints/";
+    private static DynmapCommonAPI dynmapAPI = null;
 
-    public static
-    Optional<DynmapCommonAPI> getDynmapAPI()
+    public static Optional<DynmapCommonAPI> getDynmapAPI()
     {
         return Optional.ofNullable(SharedWaypointsServer.dynmapAPI);
     }
 
     @Override
-    public
-    void onInitializeServer()
+    public void onInitializeServer()
     {
         SWCommandManager.addCommand(new CommandWaypoint());
         SWCommandManager.register();
@@ -53,16 +50,14 @@ class SharedWaypointsServer implements DedicatedServerModInitializer
             (server) -> DynmapCommonAPIListener.register(new DynmapCommonAPIListener()
             {
                 @Override
-                public
-                void apiEnabled(DynmapCommonAPI api)
+                public void apiEnabled(DynmapCommonAPI api)
                 {
                     server.execute(() -> SharedWaypointsServer.this.dynmapInitializeAndCreateWaypoints(api));
                 }
             }));
     }
 
-    private
-    void dynmapInitializeAndCreateWaypoints(DynmapCommonAPI api)
+    private void dynmapInitializeAndCreateWaypoints(DynmapCommonAPI api)
     {
         SharedWaypointsServer.dynmapAPI = api;
         MarkerAPI markerAPI = SharedWaypointsServer.dynmapAPI.getMarkerAPI();
@@ -73,8 +68,7 @@ class SharedWaypointsServer implements DedicatedServerModInitializer
         WaypointManager.INSTANCE.forEachWaypoint((waypoint) -> DynmapHelper.createMarkerFromWaypoint(waypoint, waypoints));
     }
 
-    private
-    void blueMapCreateWaypoints(BlueMapAPI api)
+    private void blueMapCreateWaypoints(BlueMapAPI api)
     {
         MarkerSet waypointSetOverworld = MarkerSet.builder().defaultHidden(true)
             .label(this.getMarkerSetLabelFromWorldID(WaypointManager.overworldIdentifier)).build();
@@ -98,15 +92,13 @@ class SharedWaypointsServer implements DedicatedServerModInitializer
         this.addBlueMapMarkerSetToWorld(api, WaypointManager.endIdentifier, waypointSetEnd);
     }
 
-    private
-    void addBlueMapMarkerSetToWorld(BlueMapAPI api, String worldID, MarkerSet markerSet)
+    private void addBlueMapMarkerSetToWorld(BlueMapAPI api, String worldID, MarkerSet markerSet)
     {
         api.getMap(BlueMapHelper.getMapIDFromWorldID(worldID))
             .ifPresent(map -> map.getMarkerSets().put(BlueMapHelper.getMarkerSetIDFromWorldID(worldID), markerSet));
     }
 
-    private
-    String getMarkerSetLabelFromWorldID(String worldID)
+    private String getMarkerSetLabelFromWorldID(String worldID)
     {
         switch (worldID)
         {

@@ -7,20 +7,17 @@ import dev.phonis.sharedwaypoints.server.waypoints.WaypointManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.util.Formatting;
 
-public
-class CommandWaypointList extends NoArgServerCommand
+public class CommandWaypointList extends NoArgServerCommand
 {
 
-    public
-    CommandWaypointList()
+    public CommandWaypointList()
     {
         super("list");
         this.addAlias("l");
     }
 
     @Override
-    protected
-    void onOptionalCommand(CommandContext<ServerCommandSource> source)
+    protected void onOptionalCommand(CommandContext<ServerCommandSource> source)
     {
         if (WaypointManager.INSTANCE.numWaypoints() == 0)
         {

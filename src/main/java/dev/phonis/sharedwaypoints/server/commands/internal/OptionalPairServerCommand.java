@@ -6,14 +6,12 @@ import dev.phonis.sharedwaypoints.server.commands.argument.CommandArgument;
 import dev.phonis.sharedwaypoints.server.commands.exception.CommandException;
 import net.minecraft.server.command.ServerCommandSource;
 
-public abstract
-class OptionalPairServerCommand<A, B> extends OptionalSingleServerCommand<A>
+public abstract class OptionalPairServerCommand<A, B> extends OptionalSingleServerCommand<A>
 {
 
     protected final CommandArgument<B> b;
 
-    public
-    OptionalPairServerCommand(String name, CommandArgument<A> a, CommandArgument<B> b)
+    public OptionalPairServerCommand(String name, CommandArgument<A> a, CommandArgument<B> b)
     {
         super(name, a);
 
@@ -23,15 +21,12 @@ class OptionalPairServerCommand<A, B> extends OptionalSingleServerCommand<A>
         this.arguments.add(this.b);
     }
 
-    private
-    void passArgs(CommandContext<ServerCommandSource> source) throws CommandException, CommandSyntaxException
+    private void passArgs(CommandContext<ServerCommandSource> source) throws CommandException, CommandSyntaxException
     {
-        this.onOptionalCommand(source, (A) source.getArgument(this.a.name, Object.class),
-            (B) source.getArgument(this.b.name, Object.class));
+        this.onOptionalCommand(source, (A) source.getArgument(this.a.name, Object.class), (B) source.getArgument(this.b.name, Object.class));
     }
 
-    protected abstract
-    void onOptionalCommand(CommandContext<ServerCommandSource> source, A a, B b)
+    protected abstract void onOptionalCommand(CommandContext<ServerCommandSource> source, A a, B b)
         throws CommandException, CommandSyntaxException;
 
 }

@@ -22,36 +22,31 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.Vec3d;
 
-public
-class CommandWaypointUpdate extends OptionalPairServerCommand<String, PosArgument>
+public class CommandWaypointUpdate extends OptionalPairServerCommand<String, PosArgument>
 {
 
-    public
-    CommandWaypointUpdate()
+    public CommandWaypointUpdate()
     {
         super("update", new WaypointCommandArgument("waypoint"), new PositionCommandArgument("position"));
         this.addAlias("u");
     }
 
     @Override
-    protected
-    void onOptionalCommand(CommandContext<ServerCommandSource> source) throws CommandException
+    protected void onOptionalCommand(CommandContext<ServerCommandSource> source) throws CommandException
     {
         throw new CommandException("You must provide a waypoint name.");
     }
 
     @Override
-    protected
-    void onOptionalCommand(CommandContext<ServerCommandSource> source, String s, PosArgument posArgument)
+    protected void onOptionalCommand(CommandContext<ServerCommandSource> source, String s, PosArgument posArgument)
         throws CommandException, CommandSyntaxException
     {
-        this.onOptionalCommand(source, s, posArgument.toAbsolutePos(source.getSource()),
-            source.getSource().getPlayer().getServerWorld());
+        this.onOptionalCommand(source, s, posArgument.getPos(source.getSource()), source.getSource().getPlayer()
+            .getServerWorld());
     }
 
     @Override
-    protected
-    void onOptionalCommand(CommandContext<ServerCommandSource> source, String s)
+    protected void onOptionalCommand(CommandContext<ServerCommandSource> source, String s)
         throws CommandException, CommandSyntaxException
     {
         ServerPlayerEntity player = source.getSource().getPlayer();
@@ -59,9 +54,8 @@ class CommandWaypointUpdate extends OptionalPairServerCommand<String, PosArgumen
         this.onOptionalCommand(source, s, player.getPos(), player.getServerWorld());
     }
 
-    private
-    void onOptionalCommand(CommandContext<ServerCommandSource> source, String s, Vec3d position, ServerWorld world)
-        throws CommandException
+    private void onOptionalCommand(CommandContext<ServerCommandSource> source, String s, Vec3d position,
+                                   ServerWorld world) throws CommandException
     {
         if (!WaypointManager.INSTANCE.hasWaypoint(s))
         {
@@ -69,7 +63,7 @@ class CommandWaypointUpdate extends OptionalPairServerCommand<String, PosArgumen
         }
 
         String oldWaypointWorld = WaypointManager.INSTANCE.getWaypoint(s).getWorld();
-        Waypoint waypoint    = WaypointManager.INSTANCE.updateWaypoint(s, position, world);
+        Waypoint waypoint = WaypointManager.INSTANCE.updateWaypoint(s, position, world);
 
         ContextUtil.sendMessage(source,
             Formatting.WHITE + "Position of '" + Formatting.AQUA + waypoint.getName() + Formatting.WHITE + "' ➤ " +
@@ -77,18 +71,16 @@ class CommandWaypointUpdate extends OptionalPairServerCommand<String, PosArgumen
             ", " + (int) waypoint.getY() + ", " + (int) waypoint.getZ());
         if (!oldWaypointWorld.equals(waypoint.getWorld()))
         {
-            BlueMapAPI.getInstance()
-                .flatMap(api -> api.getMap(BlueMapHelper.getMapIDFromWorldID(oldWaypointWorld))).ifPresent(
-                    (map) -> map.getMarkerSets().get(BlueMapHelper.getMarkerSetIDFromWorldID(oldWaypointWorld))
-                        .remove(waypoint.getName()));
+            BlueMapAPI.getInstance().flatMap(api -> api.getMap(BlueMapHelper.getMapIDFromWorldID(oldWaypointWorld)))
+                .ifPresent((map) -> map.getMarkerSets().get(BlueMapHelper.getMarkerSetIDFromWorldID(oldWaypointWorld))
+                    .remove(waypoint.getName()));
         }
         BlueMapAPI.getInstance().flatMap(api -> api.getMap(BlueMapHelper.getMapIDFromWorldID(waypoint.getWorld())))
             .ifPresent((map) -> map.getMarkerSets().get(BlueMapHelper.getMarkerSetIDFromWorldID(waypoint.getWorld()))
                 .put(waypoint.getName(), BlueMapHelper.getMarkerFromWaypoint(waypoint)));
-        SharedWaypointsServer.getDynmapAPI().ifPresent(
-            api -> api.getMarkerAPI().getMarkerSet(DynmapHelper.markerSetID).findMarker(waypoint.getName())
-                .setLocation(DynmapHelper.getDynmapWorldIDFromSWWorldID(waypoint.getWorld()), waypoint.getX(),
-                    waypoint.getY(), waypoint.getZ()));
+        SharedWaypointsServer.getDynmapAPI()
+            .ifPresent(api -> api.getMarkerAPI().getMarkerSet(DynmapHelper.markerSetID).findMarker(waypoint.getName())
+                .setLocation(DynmapHelper.getDynmapWorldIDFromSWWorldID(waypoint.getWorld()), waypoint.getX(), waypoint.getY(), waypoint.getZ()));
         SWNetworkManager.INSTANCE.sendToSubscribed(source, new SWWaypointUpdateAction(waypoint));
     }
 

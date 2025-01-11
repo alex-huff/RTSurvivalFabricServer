@@ -9,8 +9,7 @@ import dev.phonis.sharedwaypoints.server.networking.protocol.persistant.SWPacket
 import java.io.DataInputStream;
 import java.io.IOException;
 
-public
-interface ProtocolAdapter
+public interface ProtocolAdapter
 {
 
     SWAction toAction(DataInputStream dis) throws IOException;
@@ -21,8 +20,7 @@ interface ProtocolAdapter
 
     SWPacket fromWaypointRemove(SWWaypointRemoveAction action);
 
-    default
-    SWPacket fromAction(SWAction action)
+    default SWPacket fromAction(SWAction action)
     {
         if (action instanceof SWWaypointInitializeAction swWaypointInitializeAction)
         {

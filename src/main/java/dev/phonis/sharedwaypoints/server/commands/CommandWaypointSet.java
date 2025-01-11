@@ -16,30 +16,26 @@ import dev.phonis.sharedwaypoints.server.waypoints.WaypointManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.util.Formatting;
 
-public
-class CommandWaypointSet extends OptionalSingleServerCommand<String>
+public class CommandWaypointSet extends OptionalSingleServerCommand<String>
 {
 
-    public
-    CommandWaypointSet()
+    public CommandWaypointSet()
     {
         super("set", new StringCommandArgument("name"));
         this.addAlias("s");
     }
 
     @Override
-    protected
-    void onOptionalCommand(CommandContext<ServerCommandSource> source) throws CommandException
+    protected void onOptionalCommand(CommandContext<ServerCommandSource> source) throws CommandException
     {
         throw new CommandException("You must provide a waypoint name.");
     }
 
     @Override
-    protected
-    void onOptionalCommand(CommandContext<ServerCommandSource> source, String s)
+    protected void onOptionalCommand(CommandContext<ServerCommandSource> source, String s)
     {
         Waypoint oldWaypoint = WaypointManager.INSTANCE.getWaypoint(s);
-        Waypoint waypoint    = WaypointManager.INSTANCE.addWaypoint(source, s);
+        Waypoint waypoint = WaypointManager.INSTANCE.addWaypoint(source, s);
 
         ContextUtil.sendMessage(source,
             Formatting.WHITE + "Waypoint '" + Formatting.AQUA + waypoint.getName() + Formatting.WHITE + "' ➤ " +
@@ -48,15 +44,17 @@ class CommandWaypointSet extends OptionalSingleServerCommand<String>
         if (oldWaypoint != null && !oldWaypoint.getWorld().equals(waypoint.getWorld()))
         {
             BlueMapAPI.getInstance()
-                .flatMap(api -> api.getMap(BlueMapHelper.getMapIDFromWorldID(oldWaypoint.getWorld()))).ifPresent(
-                    map -> map.getMarkerSets().get(BlueMapHelper.getMarkerSetIDFromWorldID(oldWaypoint.getWorld()))
-                        .remove(oldWaypoint.getName()));
+                .flatMap(api -> api.getMap(BlueMapHelper.getMapIDFromWorldID(oldWaypoint.getWorld())))
+                .ifPresent(map -> map.getMarkerSets()
+                    .get(BlueMapHelper.getMarkerSetIDFromWorldID(oldWaypoint.getWorld()))
+                    .remove(oldWaypoint.getName()));
         }
         BlueMapAPI.getInstance().flatMap(api -> api.getMap(BlueMapHelper.getMapIDFromWorldID(waypoint.getWorld())))
             .ifPresent((map) -> map.getMarkerSets().get(BlueMapHelper.getMarkerSetIDFromWorldID(waypoint.getWorld()))
                 .put(waypoint.getName(), BlueMapHelper.getMarkerFromWaypoint(waypoint)));
-        SharedWaypointsServer.getDynmapAPI().ifPresent(api -> DynmapHelper.createMarkerFromWaypoint(waypoint,
-            api.getMarkerAPI().getMarkerSet(DynmapHelper.markerSetID)));
+        SharedWaypointsServer.getDynmapAPI()
+            .ifPresent(api -> DynmapHelper.createMarkerFromWaypoint(waypoint, api.getMarkerAPI()
+                .getMarkerSet(DynmapHelper.markerSetID)));
         SWNetworkManager.INSTANCE.sendToSubscribed(source, new SWWaypointUpdateAction(waypoint));
     }
 

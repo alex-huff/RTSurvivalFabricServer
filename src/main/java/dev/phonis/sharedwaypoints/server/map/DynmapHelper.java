@@ -5,16 +5,14 @@ import dev.phonis.sharedwaypoints.server.waypoints.WaypointManager;
 import org.dynmap.markers.Marker;
 import org.dynmap.markers.MarkerSet;
 
-public
-class DynmapHelper
+public class DynmapHelper
 {
 
     public static final String markerSetID = "dynmap-waypoints";
 
     public static final String markerSetLabel = "Waypoints";
 
-    public static
-    String getDynmapWorldIDFromSWWorldID(String swWorldID)
+    public static String getDynmapWorldIDFromSWWorldID(String swWorldID)
     {
         switch (swWorldID)
         {
@@ -33,17 +31,14 @@ class DynmapHelper
         }
     }
 
-    public static
-    void createMarkerFromWaypoint(Waypoint waypoint, MarkerSet markerSet)
+    public static void createMarkerFromWaypoint(Waypoint waypoint, MarkerSet markerSet)
     {
         Marker existingMarker = markerSet.findMarker(waypoint.getName());
         if (existingMarker != null)
         {
             existingMarker.deleteMarker();
         }
-        markerSet.createMarker(waypoint.getName(), waypoint.getName(),
-            DynmapHelper.getDynmapWorldIDFromSWWorldID(waypoint.getWorld()), waypoint.getX(), waypoint.getY(),
-            waypoint.getZ(), markerSet.getDefaultMarkerIcon(), false);
+        markerSet.createMarker(waypoint.getName(), waypoint.getName(), DynmapHelper.getDynmapWorldIDFromSWWorldID(waypoint.getWorld()), waypoint.getX(), waypoint.getY(), waypoint.getZ(), markerSet.getDefaultMarkerIcon(), false);
     }
 
 }
